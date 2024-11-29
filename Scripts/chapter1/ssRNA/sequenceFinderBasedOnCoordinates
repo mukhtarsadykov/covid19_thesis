@@ -1,0 +1,11 @@
+#extract sequences based on knowkn coordinates
+# requirement a file with coordinates and a file with genome to look
+
+for i in $(cat coord.txt)
+do
+
+s=$(echo $i | cut -d ':' -f 1)
+e=$(echo $i | cut -d ':' -f 2 | tr -d "\n")
+
+echo "cut -c $s-$e reference.fasta >> ssrna.txt" >> tmp.sh
+done

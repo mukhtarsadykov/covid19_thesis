@@ -1,0 +1,10 @@
+awk -f checkCsites.awk pos=26228 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26228.txt
+awk -f checkCsites.awk pos=26238 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26238.txt
+awk -f checkCsites.awk pos=26242 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26242.txt
+awk -f checkCsites.awk pos=26250 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26250.txt
+awk -f checkCsites.awk pos=26252 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26252.txt
+awk -f checkCsites.awk pos=26256 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26256.txt
+awk -f checkCsites.awk pos=26261 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26261.txt
+awk -f checkCsites.awk pos=26270 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26270.txt
+awk -f checkCsites.awk pos=26276 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26276.txt
+awk -f checkCsites.awk pos=26292 /ibex/projects/c2077/Mukhtar/virus/virus2.0/output/sequences.aligned.fasta > singleC_files/singleC.26292.txt
