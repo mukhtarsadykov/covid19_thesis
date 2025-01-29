@@ -1,0 +1,23 @@
+GID	GENE	NAME	GWEIGHT	DEGs	DMRs
+AID				ARRY1X	ARRY2X
+EWEIGHT				1	1
+GENE17X	PGB:00020	Tissue-specific: prostate	1	0.194	0.115
+GENE16X	PGB:00014	Tissue-specific: lung	1	0.956	-0.000
+GENE12X	PGB:00054	Tissue-specific: Tongue	1	0.858	-0.000
+GENE2X	PGB:00003	Tissue-specific: tonsil	1	0.741	-0.000
+GENE5X	PGB:00104	Cell-specific: CD33+ Myeloid	1	0.721	-0.000
+GENE15X	PGB:00008	Tissue-specific: spleen	1	1.000	-0.000
+GENE11X	PGB:00030	Tissue-specific: bone marrow	1	1.000	-0.000
+GENE14X	PGB:00026	Tissue-specific: Blood	1	1.000	-0.000
+GENE18X	PGB:00035	Tissue-specific: ovary	1	0.168	-0.000
+GENE10X	PGB:00077	Cell-specific: CD56+ NKCells	1	0.185	-0.000
+GENE4X	PGB:00151	Cell-specific: HT1080	1	0.167	-0.000
+GENE8X	PGB:00079	Cell-specific: THY+	1	0.158	-0.000
+GENE20X	PGB:00029	Tissue-specific: placenta	1	0.211	-0.000
+GENE9X	PGB:00071	Cell-specific: HUVEC	1	0.220	-0.000
+GENE7X	PGB:00129	Cell-specific: CD14+ Monocytes	1	0.291	-0.000
+GENE3X	PGB:00169	Cell-specific: T3M4	1	0.216	-0.000
+GENE6X	PGB:00011	Tissue-specific: Smooth Muscle	1	0.297	-0.000
+GENE19X	PGB:00094	Cell-specific: Bronchial Epithelial Cells	1	0.372	-0.000
+GENE1X	PGB:00093	Cell-specific: Vaginal Epithelial	1	0.361	-0.000
+GENE13X	PGB:00013	Tissue-specific: skin	1	0.342	-0.000

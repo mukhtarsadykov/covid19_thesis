@@ -1,0 +1,23 @@
+GID	GENE	NAME	GWEIGHT	DEGs	DMRs
+AID				ARRY1X	ARRY2X
+EWEIGHT				1	1
+GENE19X	C0011603	Dermatitis	1	1.000	0.100
+GENE15X	C0162871	Aortic Aneurysm, Abdominal	1	1.000	0.114
+GENE14X	C3714514	Infection	1	1.000	0.123
+GENE2X	C0031090	Periodontal Diseases	1	1.000	0.115
+GENE9X	C0376618	Endotoxemia	1	1.000	0.134
+GENE20X	C0242966	Systemic Inflammatory Response Syndrome	1	1.000	-0.000
+GENE18X	C0031099	Periodontitis	1	1.000	-0.000
+GENE17X	C0021368	Inflammation	1	1.000	-0.000
+GENE16X	C3495559	Juvenile arthritis	1	1.000	-0.000
+GENE13X	C0024115	Lung diseases	1	1.000	-0.000
+GENE12X	C0037274	Dermatologic disorders	1	1.000	-0.000
+GENE11X	C0011615	Dermatitis, Atopic	1	1.000	-0.000
+GENE10X	C0004943	Behcet Syndrome	1	1.000	-0.000
+GENE8X	C3875321	Inflammatory dermatosis	1	1.000	-0.000
+GENE7X	C0024530	Malaria	1	1.000	-0.000
+GENE6X	C0004623	Bacterial Infections	1	1.000	-0.000
+GENE5X	C0017661	IGA Glomerulonephritis	1	1.000	-0.000
+GENE4X	C0041327	Tuberculosis, Pulmonary	1	1.000	-0.000
+GENE1X	C2717865	Anti-Neutrophil Cytoplasmic Antibody-Associated Vasculitis	1	1.000	-0.000
+GENE3X	C3714636	Pneumonitis	1	1.000	-0.000

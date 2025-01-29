@@ -1,0 +1,17 @@
+FDR p-value,GO_List,#genes
+5.83036E-08,GO:0000902 cell morphogenesis,28
+7.6351E-07,GO:0120035 regulation of plasma membrane bounded cell projection organization,23
+2.26526E-06,GO:0030036 actin cytoskeleton organization,25
+2.54683E-06,GO:0098657 import into cell,25
+1.21677E-05,GO:0043087 regulation of GTPase activity,22
+1.34306E-05,GO:0007167 enzyme-linked receptor protein signaling pathway,21
+2.59646E-05,GO:0008285 negative regulation of cell population proliferation,21
+0.000114992,GO:0010632 regulation of epithelial cell migration,20
+0.000309698,GO:1902105 regulation of leukocyte differentiation,22
+0.00050597,GO:0006468 protein phosphorylation,25
+0.000632684,GO:0050905 neuromuscular process,19
+0.000698949,GO:0031346 positive regulation of cell projection organization,14
+0.001627747,GO:0019079 viral genome replication,19
+0.003349074,GO:1990138 neuron projection extension,23
+0.004375711,GO:0007129 homologous chromosome pairing at meiosis,21
+0.00673618,GO:0062207 regulation of pattern recognition receptor signaling pathway,19

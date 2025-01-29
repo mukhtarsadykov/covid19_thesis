@@ -1,0 +1,23 @@
+GID	GENE	NAME	GWEIGHT	DEGs	DMRs
+AID				ARRY1X	ARRY2X
+EWEIGHT				1	1
+GENE20X	GO:0002237	GO:0002237: response to molecule of bacterial origin	1	0.982	-0.000
+GENE19X	R-HSA-6783783	R-HSA-6783783: Interleukin-10 signaling	1	0.678	-0.000
+GENE16X	hsa04380	hsa04380: Osteoclast differentiation	1	0.720	-0.000
+GENE15X	GO:0001819	GO:0001819: positive regulation of cytokine production	1	0.945	-0.000
+GENE12X	GO:0002274	GO:0002274: myeloid leukocyte activation	1	0.634	-0.000
+GENE11X	GO:0071674	GO:0071674: mononuclear cell migration	1	0.637	-0.000
+GENE2X	R-HSA-198933	R-HSA-198933: Immunoregulatory interactions between a Lymphoid and a non-Lymphoid cell	1	0.748	-0.000
+GENE4X	GO:0030335	GO:0030335: positive regulation of cell migration	1	0.782	-0.000
+GENE18X	GO:0001775	GO:0001775: cell activation	1	1.000	-0.000
+GENE17X	GO:0009617	GO:0009617: response to bacterium	1	1.000	-0.000
+GENE14X	GO:0002697	GO:0002697: regulation of immune effector process	1	1.000	-0.000
+GENE13X	GO:0006954	GO:0006954: inflammatory response	1	1.000	-0.000
+GENE10X	R-HSA-6798695	R-HSA-6798695: Neutrophil degranulation	1	1.000	-0.000
+GENE9X	GO:0071345	GO:0071345: cellular response to cytokine stimulus	1	1.000	-0.000
+GENE8X	GO:0050727	GO:0050727: regulation of inflammatory response	1	1.000	-0.000
+GENE1X	GO:0050865	GO:0050865: regulation of cell activation	1	1.000	-0.000
+GENE7X	GO:0050900	GO:0050900: leukocyte migration	1	1.000	-0.000
+GENE6X	hsa05135	hsa05135: Yersinia infection	1	0.417	0.298
+GENE3X	R-HSA-372790	R-HSA-372790: Signaling by GPCR	1	0.874	0.138
+GENE5X	R-HSA-109582	R-HSA-109582: Hemostasis	1	0.641	0.191

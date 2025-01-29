@@ -1,0 +1,37 @@
+>Running CIBERSORTxFractions...
+>[Options] single_cell: TRUE
+>[Options] refsample: files/mukhtar.sadykov@kaust.edu.sa/scRNA_cells.txt
+>[Options] replicates: 5
+>[Options] sampling: 0.5
+>[Options] fraction: 0.75
+>[Options] k.max: 999
+>[Options] q.value: 0.01
+>[Options] G.min: 300
+>[Options] G.max: 500
+>[Options] filter: FALSE
+>[Options] verbose: TRUE
+>[Options] QN: FALSE
+>[Options] outdir: files/mukhtar.sadykov@kaust.edu.sa/results/
+>[Options] label: Job3
+>Making reference sample file.
+>Making phenotype class file.
+>==========Signature Matrix Settings============
+>Pure samples file:  files/mukhtar.sadykov@kaust.edu.sa/results//CIBERSORTx_Job3_scRNA_cells_inferred_refsample.txt 
+>Phenotype classes file:  files/mukhtar.sadykov@kaust.edu.sa/results//CIBERSORTx_Job3_scRNA_cells_inferred_phenoclasses.txt 
+>Minimum number of DEGs to consider from each phenotype for signature matrix set to: 300
+>Maximum number of DEGs to consider from each phenotype for signature matrix set to: 500
+>Q-value for signature matrix construction set to: 0.01 
+>Quantile normalization of input samples is disabled
+>===============================================
+>R version 4.4.0 (2024-04-24)
+>Loaded 190 columns and 11183 rows
+>=============Make Signature Matrix=============
+>Maximum condition number (kappa): 999 
+>51516 DEG expressed across 38 samples were identified
+>Group size: 300, Kappa: 54.4532412276896
+>Best kappa: 54.4532412276896 
+>SVD UpperRightDiag: 398429.145367053 
+>SVD LowerRightDiag: 7316.90412515704 
+>Your custom signature matrix is ready.
+NULL
+All done.

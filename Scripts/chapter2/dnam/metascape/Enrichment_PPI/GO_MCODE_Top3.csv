@@ -1,0 +1,9 @@
+Network,Annotation
+MyList,hsa04360|Axon guidance|-11.1;GO:0000902|cell morphogenesis|-9.6;GO:0120035|regulation of plasma membrane bounded cell projection organization|-8.6
+MyList_MCODE_ALL,R-HSA-2187338|Visual phototransduction|-8.8;M113|PID NFAT 3PATHWAY|-8.4;WP3888|VEGFA VEGFR2 signaling|-7.7
+MyList_SUB1_MCODE_1,hsa00980|Metabolism of xenobiotics by cytochrome P450|-8.5;GO:0006631|fatty acid metabolic process|-8.1;GO:0019752|carboxylic acid metabolic process|-8.1
+MyList_SUB1_MCODE_2,M113|PID NFAT 3PATHWAY|-13.9;M272|PID CD8 TCR DOWNSTREAM PATHWAY|-10.0;WP3888|VEGFA VEGFR2 signaling|-9.2
+MyList_SUB1_MCODE_3,R-HSA-2022928|HS-GAG biosynthesis|-11.4;R-HSA-975634|Retinoid metabolism and transport|-10.7;R-HSA-6806667|Metabolism of fat-soluble vitamins|-10.6
+MyList_SUB1_MCODE_4,R-HSA-73980|RNA Polymerase III Transcription Termination|-8.8;R-HSA-74158|RNA Polymerase III Transcription|-8.0;R-HSA-749476|RNA Polymerase III Abortive And Retractive Initiation|-8.0
+MyList_SUB1_MCODE_5,GO:0008277|regulation of G protein-coupled receptor signaling pathway|-6.8;R-HSA-418594|G alpha (i) signalling events|-5.9;R-HSA-388396|GPCR downstream signalling|-5.0
+MyList_SUB2_MCODE_8,R-HSA-416476|G alpha (q) signalling events|-6.4;R-HSA-373076|Class A/1 (Rhodopsin-like receptors)|-5.9;R-HSA-500792|GPCR ligand binding|-5.4

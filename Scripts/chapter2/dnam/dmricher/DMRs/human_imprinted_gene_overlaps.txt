@@ -1,0 +1,21 @@
+Analyzing All DMRs
+Annotating 460 regions from hg38 with gene symbols
+Annotating 16914 regions from hg38 with gene symbols
+3 out of 106 human imprinted genes are present in the 460 DMRs
+The p-value for the over-enrichment analysis is 0.43
+The imprinted genes in the DMRs are: DLGAP2, TP73 and LRP1
+
+Analyzing Hypermethylated DMRs
+Annotating 25 regions from hg38 with gene symbols
+Annotating 16914 regions from hg38 with gene symbols
+0 out of 106 human imprinted genes are present in the 25 DMRs
+The p-value for the over-enrichment analysis is 1
+The imprinted genes in the DMRs are: 
+
+Analyzing Hypomethylated DMRs
+Annotating 435 regions from hg38 with gene symbols
+Annotating 16914 regions from hg38 with gene symbols
+3 out of 106 human imprinted genes are present in the 435 DMRs
+The p-value for the over-enrichment analysis is 0.4
+The imprinted genes in the DMRs are: DLGAP2, TP73 and LRP1
+

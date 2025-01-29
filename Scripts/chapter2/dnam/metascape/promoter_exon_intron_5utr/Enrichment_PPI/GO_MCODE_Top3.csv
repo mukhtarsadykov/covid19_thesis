@@ -1,0 +1,35 @@
+Network,Annotation
+DEGs,R-HSA-6798695|Neutrophil degranulation|-54.5;GO:0006954|inflammatory response|-48.1;GO:0032103|positive regulation of response to external stimulus|-37.5
+DEGs_MCODE_ALL,R-HSA-373076|Class A/1 (Rhodopsin-like receptors)|-34.3;R-HSA-500792|GPCR ligand binding|-33.3;R-HSA-388396|GPCR downstream signalling|-30.9
+DEGs_SUB1_MCODE_1,R-HSA-418594|G alpha (i) signalling events|-36.6;R-HSA-500792|GPCR ligand binding|-36.4;R-HSA-373076|Class A/1 (Rhodopsin-like receptors)|-36.1
+DEGs_SUB1_MCODE_2,GO:0006954|inflammatory response|-12.0;M264|PID TOLL ENDOGENOUS PATHWAY|-11.5;R-HSA-166016|Toll Like Receptor 4 (TLR4) Cascade|-11.4
+DEGs_SUB1_MCODE_3,R-HSA-9031628|NGF-stimulated transcription|-9.8;R-HSA-198725|Nuclear Events (kinase and transcription factor activation)|-9.0;R-HSA-187037|Signaling by NTRK1 (TRKA)|-7.9
+DEGs_SUB1_MCODE_4,R-HSA-6809371|Formation of the cornified envelope|-16.7;R-HSA-6805567|Keratinization|-15.1;GO:0031424|keratinization|-8.8
+DEGs_SUB1_MCODE_5,R-HSA-198933|Immunoregulatory interactions between a Lymphoid and a non-Lymphoid cell|-14.2;R-HSA-1280218|Adaptive Immune System|-9.6;R-HSA-2172127|DAP12 interactions|-7.2
+DEGs_SUB1_MCODE_6,R-HSA-416476|G alpha (q) signalling events|-12.9;R-HSA-373076|Class A/1 (Rhodopsin-like receptors)|-11.8;R-HSA-500792|GPCR ligand binding|-10.9
+DEGs_SUB1_MCODE_7,GO:0050729|positive regulation of inflammatory response|-11.4;GO:0070269|pyroptotic inflammatory response|-11.3;hsa04621|NOD-like receptor signaling pathway|-11.1
+DEGs_SUB1_MCODE_8,hsa00500|Starch and sucrose metabolism|-11.6;hsa00052|Galactose metabolism|-8.4;hsa04973|Carbohydrate digestion and absorption|-7.7
+DEGs_SUB1_MCODE_9,GO:0045730|respiratory burst|-9.4;R-HSA-5668599|RHO GTPases Activate NADPH Oxidases|-9.4;R-HSA-1222556|ROS and RNS production in phagocytes|-8.8
+DMRs,hsa04360|Axon guidance|-12.2;hsa04144|Endocytosis|-9.2;R-HSA-9675108|Nervous system development|-9.1
+DMRs_MCODE_ALL,M113|PID NFAT 3PATHWAY|-9.5;R-HSA-2187338|Visual phototransduction|-8.0;WP4666|Hepatitis B infection|-7.2
+DMRs_SUB1_MCODE_1,GO:0019752|carboxylic acid metabolic process|-7.2;GO:0006631|fatty acid metabolic process|-6.7;hsa00980|Metabolism of xenobiotics by cytochrome P450|-6.5
+DMRs_SUB1_MCODE_2,M113|PID NFAT 3PATHWAY|-13.9;M272|PID CD8 TCR DOWNSTREAM PATHWAY|-10.0;WP3888|VEGFA VEGFR2 signaling|-9.2
+DMRs_SUB1_MCODE_3,R-HSA-73980|RNA Polymerase III Transcription Termination|-8.8;R-HSA-74158|RNA Polymerase III Transcription|-8.0;R-HSA-749476|RNA Polymerase III Abortive And Retractive Initiation|-8.0
+DMRs_SUB1_MCODE_4,R-HSA-975634|Retinoid metabolism and transport|-7.9;R-HSA-6806667|Metabolism of fat-soluble vitamins|-7.8;R-HSA-2187338|Visual phototransduction|-6.8
+DMRs_SUB1_MCODE_5,GO:0008277|regulation of G protein-coupled receptor signaling pathway|-6.8;R-HSA-418594|G alpha (i) signalling events|-5.9;R-HSA-388396|GPCR downstream signalling|-5.0
+_FINAL,GO:0006954|inflammatory response|-50.5;R-HSA-6798695|Neutrophil degranulation|-45.8;GO:0032103|positive regulation of response to external stimulus|-33.5
+_FINAL_MCODE_ALL,GO:0006954|inflammatory response|-34.3;R-HSA-388396|GPCR downstream signalling|-30.1;R-HSA-372790|Signaling by GPCR|-29.9
+_FINAL_SUB1_MCODE_1,R-HSA-418594|G alpha (i) signalling events|-38.5;R-HSA-500792|GPCR ligand binding|-38.2;R-HSA-373076|Class A/1 (Rhodopsin-like receptors)|-38.1
+_FINAL_SUB1_MCODE_2,GO:0050727|regulation of inflammatory response|-11.5;GO:0050778|positive regulation of immune response|-11.4;WP1433|Nucleotide binding oligomerization domain NOD pathway|-10.3
+_FINAL_SUB1_MCODE_3,M264|PID TOLL ENDOGENOUS PATHWAY|-12.6;R-HSA-1280218|Adaptive Immune System|-11.6;GO:0045088|regulation of innate immune response|-11.5
+_FINAL_SUB1_MCODE_4,hsa05167|Kaposi sarcoma-associated herpesvirus infection|-13.8;hsa05170|Human immunodeficiency virus 1 infection|-11.0;hsa05163|Human cytomegalovirus infection|-10.9
+_FINAL_SUB1_MCODE_5,GO:0030029|actin filament-based process|-7.1;R-HSA-9662360|Sensory processing of sound by inner hair cells of the cochlea|-6.4;R-HSA-9659379|Sensory processing of sound|-6.3
+_FINAL_SUB1_MCODE_6,R-HSA-6809371|Formation of the cornified envelope|-14.3;R-HSA-6805567|Keratinization|-12.9;GO:0031424|keratinization|-9.1
+_FINAL_SUB1_MCODE_7,R-HSA-416476|G alpha (q) signalling events|-10.8;R-HSA-373076|Class A/1 (Rhodopsin-like receptors)|-9.8;R-HSA-500792|GPCR ligand binding|-9.1
+_FINAL_SUB1_MCODE_8,hsa00052|Galactose metabolism|-11.3;hsa00500|Starch and sucrose metabolism|-10.9;hsa04973|Carbohydrate digestion and absorption|-7.3
+_FINAL_SUB1_MCODE_9,R-HSA-73980|RNA Polymerase III Transcription Termination|-8.8;R-HSA-74158|RNA Polymerase III Transcription|-8.0;R-HSA-749476|RNA Polymerase III Abortive And Retractive Initiation|-8.0
+_FINAL_SUB1_MCODE_10,R-HSA-418555|G alpha (s) signalling events|-9.1;R-HSA-388396|GPCR downstream signalling|-6.7;R-HSA-372790|Signaling by GPCR|-6.5
+_FINAL_SUB1_MCODE_11,"M143|PID IL2 PI3K PATHWAY|-8.3;GO:2000514|regulation of CD4-positive, alpha-beta T cell activation|-7.2;GO:0046634|regulation of alpha-beta T cell activation|-6.7"
+_FINAL_SUB1_MCODE_12,GO:0045109|intermediate filament organization|-7.9;GO:0031424|keratinization|-7.7;GO:0045104|intermediate filament cytoskeleton organization|-7.6
+_FINAL_SUB1_MCODE_13,hsa00980|Metabolism of xenobiotics by cytochrome P450|-7.8;GO:0006805|xenobiotic metabolic process|-7.2;WP702|Metapathway biotransformation Phase I and II|-6.7
+_FINAL_SUB1_MCODE_14,hsa04380|Osteoclast differentiation|-7.0;R-HSA-6798695|Neutrophil degranulation|-5.4

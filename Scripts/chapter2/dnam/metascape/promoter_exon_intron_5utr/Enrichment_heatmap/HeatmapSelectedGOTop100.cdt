@@ -1,0 +1,103 @@
+GID	GENE	NAME	GWEIGHT	DEGs	DMRs
+AID				ARRY1X	ARRY2X
+EWEIGHT				1	1
+GENE75X	hsa04360	hsa04360: Axon guidance	1	-0.000	0.468
+GENE89X	M272	M272: PID CD8 TCR DOWNSTREAM PATHWAY	1	-0.000	0.274
+GENE43X	GO:0000902	GO:0000902: cell morphogenesis	1	-0.000	0.294
+GENE9X	GO:0120035	GO:0120035: regulation of plasma membrane bounded cell projection organization	1	-0.000	0.288
+GENE35X	hsa04144	hsa04144: Endocytosis	1	-0.000	0.293
+GENE93X	GO:0001775	GO:0001775: cell activation	1	1.000	-0.000
+GENE85X	GO:0006954	GO:0006954: inflammatory response	1	1.000	-0.000
+GENE79X	R-HSA-6798695	R-HSA-6798695: Neutrophil degranulation	1	1.000	-0.000
+GENE78X	GO:0071345	GO:0071345: cellular response to cytokine stimulus	1	1.000	-0.000
+GENE63X	GO:0009617	GO:0009617: response to bacterium	1	1.000	-0.000
+GENE47X	GO:0050900	GO:0050900: leukocyte migration	1	1.000	-0.000
+GENE20X	GO:0050865	GO:0050865: regulation of cell activation	1	1.000	-0.000
+GENE5X	GO:0050727	GO:0050727: regulation of inflammatory response	1	1.000	-0.000
+GENE7X	GO:0002697	GO:0002697: regulation of immune effector process	1	1.000	-0.000
+GENE97X	GO:0003013	GO:0003013: circulatory system process	1	0.265	-0.000
+GENE64X	R-HSA-2172127	R-HSA-2172127: DAP12 interactions	1	0.286	-0.000
+GENE61X	WP5283	WP5283: Chronic hyperglycemia impairment of neuron function	1	0.226	-0.000
+GENE56X	GO:0150077	GO:0150077: regulation of neuroinflammatory response	1	0.300	-0.000
+GENE54X	WP2882	WP2882: Nuclear receptors meta pathway	1	0.297	-0.000
+GENE51X	hsa05418	hsa05418: Fluid shear stress and atherosclerosis	1	0.277	-0.000
+GENE45X	GO:0010817	GO:0010817: regulation of hormone levels	1	0.271	-0.000
+GENE44X	GO:0052548	GO:0052548: regulation of endopeptidase activity	1	0.300	-0.000
+GENE39X	GO:0050730	GO:0050730: regulation of peptidyl-tyrosine phosphorylation	1	0.223	-0.000
+GENE37X	GO:0032663	GO:0032663: regulation of interleukin-2 production	1	0.283	-0.000
+GENE36X	WP2849	WP2849: Hematopoietic stem cell differentiation	1	0.299	-0.000
+GENE26X	GO:0097191	GO:0097191: extrinsic apoptotic signaling pathway	1	0.281	-0.000
+GENE24X	GO:0031960	GO:0031960: response to corticosteroid	1	0.293	-0.000
+GENE23X	M11736	M11736: SA MMP CYTOKINE CONNECTION	1	0.299	-0.000
+GENE4X	WP117	WP117: GPCRs other	1	0.270	-0.000
+GENE11X	GO:0098543	GO:0098543: detection of other organism	1	0.271	-0.000
+GENE88X	GO:0070613	GO:0070613: regulation of protein processing	1	0.337	-0.000
+GENE83X	M65	M65: PID FRA PATHWAY	1	0.316	-0.000
+GENE76X	WP2840	WP2840: Hair follicle development cytodifferentiation stage 3 of 3	1	0.332	-0.000
+GENE71X	GO:0009612	GO:0009612: response to mechanical stimulus	1	0.451	-0.000
+GENE69X	GO:0006968	GO:0006968: cellular defense response	1	0.324	-0.000
+GENE65X	GO:0002523	GO:0002523: leukocyte migration involved in inflammatory response	1	0.346	-0.000
+GENE62X	GO:0042119	GO:0042119: neutrophil activation	1	0.355	-0.000
+GENE59X	GO:0002886	GO:0002886: regulation of myeloid leukocyte mediated immunity	1	0.427	-0.000
+GENE55X	WP4478	WP4478: LTF danger signal response pathway	1	0.346	-0.000
+GENE52X	hsa05144	hsa05144: Malaria	1	0.327	-0.000
+GENE50X	GO:0007188	GO:0007188: adenylate cyclase-modulating G protein-coupled receptor signaling pathway	1	0.462	-0.000
+GENE49X	GO:0009620	GO:0009620: response to fungus	1	0.401	-0.000
+GENE48X	GO:0032689	GO:0032689: negative regulation of type II interferon production	1	0.350	-0.000
+GENE41X	GO:0002673	GO:0002673: regulation of acute inflammatory response	1	0.461	-0.000
+GENE40X	M169	M169: PID INTEGRIN2 PATHWAY	1	0.427	-0.000
+GENE34X	WP24	WP24: Peptide GPCRs	1	0.369	-0.000
+GENE32X	WP3945	WP3945: TYROBP causal network in microglia	1	0.465	-0.000
+GENE29X	GO:0043068	GO:0043068: positive regulation of programmed cell death	1	0.363	-0.000
+GENE16X	WP5218	WP5218: Extrafollicular and follicular B cell activation by SARS CoV 2	1	0.360	-0.000
+GENE14X	hsa04625	hsa04625: C-type lectin receptor signaling pathway	1	0.341	-0.000
+GENE13X	WP2880	WP2880: Glucocorticoid receptor pathway	1	0.323	-0.000
+GENE12X	GO:0051046	GO:0051046: regulation of secretion	1	0.425	-0.000
+GENE3X	WP3937	WP3937: Microglia pathogen phagocytosis pathway	1	0.434	-0.000
+GENE8X	GO:0044703	GO:0044703: multi-organism reproductive process	1	0.450	-0.000
+GENE94X	R-HSA-6783783	R-HSA-6783783: Interleukin-10 signaling	1	0.678	-0.000
+GENE91X	GO:0007159	GO:0007159: leukocyte cell-cell adhesion	1	0.551	-0.000
+GENE90X	GO:0009611	GO:0009611: response to wounding	1	0.526	-0.000
+GENE86X	hsa05150	hsa05150: Staphylococcus aureus infection	1	0.568	-0.000
+GENE84X	GO:0002274	GO:0002274: myeloid leukocyte activation	1	0.634	-0.000
+GENE81X	GO:0002683	GO:0002683: negative regulation of immune system process	1	0.590	-0.000
+GENE80X	GO:0071674	GO:0071674: mononuclear cell migration	1	0.637	-0.000
+GENE77X	R-HSA-6809371	R-HSA-6809371: Formation of the cornified envelope	1	0.592	-0.000
+GENE72X	WP2877	WP2877: Vitamin D receptor pathway	1	0.604	-0.000
+GENE68X	hsa05133	hsa05133: Pertussis	1	0.526	-0.000
+GENE57X	GO:0050764	GO:0050764: regulation of phagocytosis	1	0.561	-0.000
+GENE53X	GO:0002252	GO:0002252: immune effector process	1	0.526	-0.000
+GENE33X	hsa04380	hsa04380: Osteoclast differentiation	1	0.720	-0.000
+GENE31X	GO:0001819	GO:0001819: positive regulation of cytokine production	1	0.945	-0.000
+GENE22X	GO:0030335	GO:0030335: positive regulation of cell migration	1	0.782	-0.000
+GENE21X	R-HSA-198933	R-HSA-198933: Immunoregulatory interactions between a Lymphoid and a non-Lymphoid cell	1	0.748	-0.000
+GENE19X	GO:0002685	GO:0002685: regulation of leukocyte migration	1	0.518	-0.000
+GENE15X	GO:0002237	GO:0002237: response to molecule of bacterial origin	1	0.982	-0.000
+GENE2X	WP2806	WP2806: Complement system	1	0.526	-0.000
+GENE10X	GO:0032649	GO:0032649: regulation of type II interferon production	1	0.615	-0.000
+GENE67X	GO:0051336	GO:0051336: regulation of hydrolase activity	1	0.337	0.213
+GENE73X	hsa05135	hsa05135: Yersinia infection	1	0.417	0.298
+GENE1X	R-HSA-372790	R-HSA-372790: Signaling by GPCR	1	0.874	0.138
+GENE25X	R-HSA-109582	R-HSA-109582: Hemostasis	1	0.641	0.191
+GENE87X	GO:0098657	GO:0098657: import into cell	1	0.480	0.189
+GENE6X	GO:0010562	GO:0010562: positive regulation of phosphorus metabolic process	1	0.309	0.103
+GENE70X	R-HSA-9658195	R-HSA-9658195: Leishmania infection	1	0.369	0.113
+GENE95X	GO:0008277	GO:0008277: regulation of G protein-coupled receptor signaling pathway	1	0.249	0.149
+GENE92X	GO:0008285	GO:0008285: negative regulation of cell population proliferation	1	0.278	0.115
+GENE74X	GO:1903034	GO:1903034: regulation of response to wounding	1	0.265	0.135
+GENE42X	M252	M252: PID IL8 CXCR1 PATHWAY	1	0.226	0.130
+GENE38X	R-HSA-1474244	R-HSA-1474244: Extracellular matrix organization	1	0.277	0.101
+GENE27X	R-HSA-416476	R-HSA-416476: G alpha (q) signalling events	1	0.224	0.144
+GENE28X	GO:0030099	GO:0030099: myeloid cell differentiation	1	0.218	0.102
+GENE99X	GO:0062207	GO:0062207: regulation of pattern recognition receptor signaling pathway	1	0.196	0.106
+GENE100X	GO:0060759	GO:0060759: regulation of response to cytokine stimulus	1	0.177	0.125
+GENE82X	GO:0022604	GO:0022604: regulation of cell morphogenesis	1	0.197	0.189
+GENE58X	hsa04650	hsa04650: Natural killer cell mediated cytotoxicity	1	0.168	0.171
+GENE30X	GO:0046903	GO:0046903: secretion	1	0.194	0.200
+GENE17X	WP3888	WP3888: VEGFA VEGFR2 signaling	1	0.158	0.200
+GENE18X	WP4666	WP4666: Hepatitis B infection	1	0.152	0.195
+GENE66X	hsa04666	hsa04666: Fc gamma R-mediated phagocytosis	1	0.174	0.215
+GENE46X	GO:0001944	GO:0001944: vasculature development	1	0.189	0.279
+GENE60X	R-HSA-9006934	R-HSA-9006934: Signaling by Receptor Tyrosine Kinases	1	0.154	0.261
+GENE96X	GO:0030029	GO:0030029: actin filament-based process	1	0.139	0.244
+GENE98X	WP4747	WP4747: Netrin UNC5B signaling	1	0.116	0.191

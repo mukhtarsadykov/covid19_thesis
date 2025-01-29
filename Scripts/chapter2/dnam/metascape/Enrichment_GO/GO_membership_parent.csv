@@ -1,0 +1,17 @@
+_MEMBER_MyList,_LogP_MyList,GO,Description,_PATTERN_,_RANK_,CHILD_GO_MyList
+1,-7.23430456643922,GO:0032502,developmental process,M1,1,GO:0000902 cell morphogenesis
+1,-6.117185125249531,GO:0050789,regulation of biological process,M1,1,GO:0120035 regulation of plasma membrane bounded cell projection organization
+1,-5.644881077009102,GO:0009987,cellular process,M1,1,GO:0030036 actin cytoskeleton organization
+1,-5.5940000008460835,GO:0051179,localization,M1,1,GO:0098657 import into cell
+1,-4.91478985514295,GO:0065007,biological regulation,M1,1,GO:0043087 regulation of GTPase activity
+1,-4.8719052538975935,GO:0050896,response to stimulus,M1,1,GO:0007167 enzyme-linked receptor protein signaling pathway
+1,-4.5856175610193555,GO:0048519,negative regulation of biological process,M1,1,GO:0008285 negative regulation of cell population proliferation
+1,-3.9393319242198865,GO:0040011,locomotion,M1,1,GO:0010632 regulation of epithelial cell migration
+1,-3.509061365273523,GO:0002376,immune system process,M1,1,GO:1902105 regulation of leukocyte differentiation
+1,-3.2958754421977203,GO:0008152,metabolic process,M1,1,GO:0006468 protein phosphorylation
+1,-3.198813184628898,GO:0032501,multicellular organismal process,M1,1,GO:0050905 neuromuscular process
+1,-3.1555546411112907,GO:0048518,positive regulation of biological process,M1,1,GO:0031346 positive regulation of cell projection organization
+1,-2.788412967105309,GO:0016032,viral process,M1,1,GO:0019079 viral genome replication
+1,-2.4750752378668484,GO:0040007,growth,M1,1,GO:1990138 neuron projection extension
+1,-2.3589513212069066,GO:0022414,reproductive process,M1,1,GO:0007129 homologous chromosome pairing at meiosis
+1,-2.1715862875894403,GO:0044419,biological process involved in interspecies interaction between organisms,M1,1,GO:0062207 regulation of pattern recognition receptor signaling pathway

@@ -1,0 +1,21 @@
+GID	GENE	NAME	GWEIGHT	DEGs	DMRs
+AID				ARRY1X	ARRY2X
+EWEIGHT				1	1
+GENE16X	GO:0040007	GO:0040007: growth	1	-0.000	0.147
+GENE13X	GO:0022414	GO:0022414: reproductive process	1	0.450	-0.000
+GENE17X	GO:0048511	GO:0048511: rhythmic process	1	0.252	-0.000
+GENE3X	GO:0032502	GO:0032502: developmental process	1	0.502	0.294
+GENE1X	GO:0050789	GO:0050789: regulation of biological process	1	0.519	0.288
+GENE2X	GO:0009987	GO:0009987: cellular process	1	0.551	0.251
+GENE4X	GO:0008152	GO:0008152: metabolic process	1	0.337	0.227
+GENE7X	GO:0065007	GO:0065007: biological regulation	1	0.337	0.271
+GENE15X	GO:0040011	GO:0040011: locomotion	1	1.000	0.145
+GENE9X	GO:0032501	GO:0032501: multicellular organismal process	1	1.000	0.132
+GENE10X	GO:0044419	GO:0044419: biological process involved in interspecies interaction between organisms	1	1.000	0.117
+GENE12X	GO:0050896	GO:0050896: response to stimulus	1	1.000	0.219
+GENE6X	GO:0051179	GO:0051179: localization	1	0.561	0.200
+GENE18X	GO:0048519	GO:0048519: negative regulation of biological process	1	0.602	0.152
+GENE11X	GO:0048518	GO:0048518: positive regulation of biological process	1	1.000	0.152
+GENE14X	GO:0002376	GO:0002376: immune system process	1	1.000	0.155
+GENE5X	GO:0042592	GO:0042592: homeostatic process	1	0.206	0.115
+GENE8X	GO:0016032	GO:0016032: viral process	1	0.124	0.155

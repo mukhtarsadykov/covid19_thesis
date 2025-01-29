@@ -1,0 +1,21 @@
+GO,Description,_LogP_DEGs,_LogP_DMRs
+PGB:00013,Tissue-specific: skin,-6.8301891244056705,0.0
+PGB:00093,Cell-specific: Vaginal Epithelial,-7.212477407529265,0.0
+PGB:00094,Cell-specific: Bronchial Epithelial Cells,-7.436002538110271,0.0
+PGB:00011,Tissue-specific: Smooth Muscle,-5.9483184333044505,0.0
+PGB:00169,Cell-specific: T3M4,-4.320616820682864,0.0
+PGB:00129,Cell-specific: CD14+ Monocytes,-5.822086936214221,0.0
+PGB:00071,Cell-specific: HUVEC,-4.404659693068735,0.0
+PGB:00029,Tissue-specific: placenta,-4.212730060341813,0.0
+PGB:00079,Cell-specific: THY+,-3.161569623947467,0.0
+PGB:00151,Cell-specific: HT1080,-3.338993150312043,0.0
+PGB:00077,Cell-specific: CD56+ NKCells,-3.7010006863493135,0.0
+PGB:00035,Tissue-specific: ovary,-3.350595194606016,0.0
+PGB:00026,Tissue-specific: Blood,-79.99796324414707,0.0
+PGB:00030,Tissue-specific: bone marrow,-59.88880395983916,0.0
+PGB:00008,Tissue-specific: spleen,-58.16275189052953,0.0
+PGB:00104,Cell-specific: CD33+ Myeloid,-14.42222791225188,0.0
+PGB:00003,Tissue-specific: tonsil,-14.820667643587742,0.0
+PGB:00054,Tissue-specific: Tongue,-17.160906235068804,0.0
+PGB:00014,Tissue-specific: lung,-19.115447481620087,0.0
+PGB:00020,Tissue-specific: prostate,-3.8725185634601385,-2.292334997385342

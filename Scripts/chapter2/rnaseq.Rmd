@@ -1,0 +1,1124 @@
+---
+title: "RNAseq_analysis_covid19"
+author: "Mukhtar Sadykov"
+date: "09/26/2024"
+---
+
+# General overview
+
+RNAseq read quality was assessed using FASTQC quality control tool [ref]. The reads were mapped to human GRCh38.p13 primary assembly using STAR (version 2.6.1) [ref]. Subsequently, gene counts were derived from the number of uniquely aligned unambiguous reads by Subread:featureCount (version v2.0.2) [ref] and library sizes were scale-normalized by the trimmed mean of M values (TMM) method using EdgeR software[ref]. The R package limma[ref] with the voomWithQualityWeights function [ref] was utilized to calculate the weighted likelihoods for all samples, based on the observed mean–variance relationship of every gene and sample. Genes with fold change greater than two and false discovery rate corrected p-value (Benjamini-Hochberg procedure) < 0.05 were considered to be differentially expressed.
+
+## Preprocessing of a count table
+
+Clean the environment, install the libraries and set working directory.
+```{r}
+rm(list=ls())
+pacman::p_load(limma, Glimma, edgeR, AnnotationDbi,org.Hs.eg.db, EnsDb.Hsapiens.v86, tidyverse, ggplot2, ... = gridExtra, ggrepel, reshape2, EnhancedVolcano, GGally, sva, pheatmap, clusterProfiler, viridis, devtools, GeneSetCluster, readxl, gplots, ggpubr, wesanderson, factoextra)
+```
+
+Visualize MDS of the raw data 
+```{r}
+cts  <- read.csv("~/Desktop/phd/Thesis/ch2/cts_total.csv", row.names = 1)
+study <- read.csv("~/Desktop/phd/Thesis/ch2/meta_11.csv", row.names=1) # dim is 80 x 19
+
+study <- study[1:11,]
+
+study$AltName <- c("ICU_01", "ICU_02", "ICU_03", "ICU_04", "NON_01", "NON_02",
+                "NON_03", "NON_04", "NON_05", "NON_06", "NON_07")
+
+cts <- cts[,row.names(study)]
+
+names(cts) <- study$AltName
+row.names(study) <- study$AltName
+
+stopifnot( identical( colnames(cts), rownames(study) ) )
+
+write.table(cts, "~/Desktop/phd/Thesis/ch2/cts_11_newNames.txt", sep = "\t")
+write.csv(study, "~/Desktop/phd/Thesis/ch2/meta_11_fordecon_newNames.csv")
+
+## Remove low expression genes for batch analysis ##
+## Do DEGs ##
+raw <- edgeR::DGEList(counts=cts, samples=study)
+sum(keep_raw <- edgeR::filterByExpr(raw, group=raw$samples$ICU, min.count = 1))  ## 60663 -> 30016
+raw <- raw[keep_raw, , keep.lib.sizes=TRUE]
+# count matrix for BN
+raw_cts <- raw$counts
+
+mdf <- limma::plotMDS(cpm(raw, log=T), top=nrow(raw), plot=F, dim.plot = c(1,2), var.explained = TRUE)
+mdf <- data.frame(Comp1=mdf$x, Comp2=mdf$y, 
+      lab=colnames(raw), 
+      ICU=raw$samples$ICU,
+      var.exp = mdf$var.explained)
+p1 <- ggplot(mdf, aes(x = Comp1, y = Comp2, label = lab, col = ICU)) +
+  geom_point(size = 7, alpha = 0.7) +  # Increase point size
+  geom_text_repel(
+    box.padding = 0.6,               # Increase padding for text
+    point.padding = 0.5,             # Increase padding for points
+    min.segment.length = 0.3,        # Adjust segment length
+    size = 6                         # Increase text size
+  ) +
+  scale_color_manual(values = c("Yes" = "#ECA39A", "No" = "#74CFD4")) +
+  labs(
+    x = paste0("Component 1 (var. explained ", round(mdf$var.exp[1], 2) * 100, "%)"),
+    y = paste0("Component 2 (var. explained ", round(mdf$var.exp[2], 2) * 100, "%)")
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(size = 20),  # Increase axis text size
+    axis.text.y = element_text(size = 20),
+    axis.title.y = element_text(size = 22),                                      # Increase axis title size
+    axis.title.x = element_text(size = 22),
+    axis.line = element_line(size = 1.2),                                        # Increase axis line thickness
+    axis.ticks = element_line(size = 1.2),                                       # Thicken axis ticks
+    legend.position = "right",
+    legend.text = element_text(size = 20),                                       # Increase legend text size
+    legend.title = element_text(size = 20)                                       # Increase legend title size
+  )
+
+```
+
+
+### Batch normalization
+Since the samples were collected in different times, and libraries were made separately, it is important to adjust for batch effect. ComBatSeq ([Zhang et al., 2020. NAR](https://urldefense.com/v3/__https://doi.org/10.1093/nargab/lqaa078__;!!Nmw4Hv0!ycgzUCXcFHGhQEnI2H47axDZcJtl7u1xv3mdW2lj-zw3lXmUe2fAPNVM9_db1ABe3hR1QDHrBz5cdvOgBfnGAV0a7_-IGozu-kLL8GmJ9U2k$ )) was used for that purpose. It uses a negative binomial regression model that retains the integer nature of count data in RNA-seq studies, making the batch adjusted data compatible with common differential expression software packages that require integer counts.
+
+Batch normalized data will be used to plot MDS plots.
+
+```{r}
+sample_names = names(cts)[1:length(names(cts))]
+
+# define conditions, library methods, and replicates
+conditions = study$ICU
+library_methods = study$Batch
+replicates = study$Replicates
+```
+
+Perform the batch correction
+```{r}
+groups = sapply(as.character(conditions), switch, "No" = 1, "Yes" = 2)
+batches = sapply(as.character(library_methods), switch, "Batch1" = 1, "Batch2" = 2, "Batch3" = 3, "Batch4" = 4, "Batch5" =5, USE.NAMES = F)
+corrected_data = sva::ComBat_seq(counts = raw_cts, batch = library_methods, group = groups)
+```
+Before making the DGE list it is convinient to have symbol version of the genes in addition to ENSGID.
+
+```{r}
+ensg <- sub("\\..*", "", rownames(raw_cts))  # remove version number in case you have it
+sym <- AnnotationDbi::mapIds(EnsDb.Hsapiens.v86, keys=ensg,
+        column="SYMBOL", keytype="GENEID") # Unable to map 1023 of 27147 requested IDs.
+gene <- data.frame(ENSGID=ensg, SYMBOL=sym, stringsAsFactors=F)
+rownames(gene) <- rownames(raw_cts)
+```
+
+
+```{r}
+batch_norm <- edgeR::DGEList(counts=corrected_data, samples=study, genes = gene)
+
+mdf2 <- limma::plotMDS(cpm(batch_norm, log=T), top=nrow(batch_norm), plot=F, dim.plot = c(1,2), var.explained = TRUE)
+mdf2 <- data.frame(Comp1=mdf2$x, Comp2=mdf2$y, 
+      lab=colnames(batch_norm), 
+      ICU=batch_norm$samples$ICU,
+      var.exp = mdf2$var.explained)
+p2 <- ggplot(mdf2, aes(x = Comp1, y = Comp2, label = lab, col = ICU)) +
+  geom_point(size = 7, alpha = 0.7) +  # Increase point size
+  geom_text_repel(
+    box.padding = 0.6,               # Increase padding for text
+    point.padding = 0.5,             # Increase padding for points
+    min.segment.length = 0.3,        # Adjust segment length
+    size = 6                         # Increase text size
+  ) +
+  scale_color_manual(values = c("Yes" = "#ECA39A", "No" = "#74CFD4")) +
+  labs(
+    x = paste0("Component 1 (var. explained ", round(mdf2$var.exp[1], 2) * 100, "%)"),
+    y = paste0("Component 2 (var. explained ", round(mdf2$var.exp[2], 2) * 100, "%)")
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(size = 20),  # Increase axis text size
+    axis.text.y = element_text(size = 20),
+    axis.title.y = element_text(size = 22),                                      # Increase axis title size
+    axis.title.x = element_text(size = 22),
+    axis.line = element_line(size = 1.2),                                        # Increase axis line thickness
+    axis.ticks = element_line(size = 1.2),                                       # Thicken axis ticks
+    legend.position = "right",
+    legend.text = element_text(size = 20),                                       # Increase legend text size
+    legend.title = element_text(size = 20)                                       # Increase legend title size
+  )
+
+pdf(file="~/Desktop/phd/Thesis/ch2/MDS_11_newNames.pdf", height=8, width=12)
+grid.arrange(p1, p2, nrow = 2)
+dev.off()
+```
+
+## Make DGEList
+
+```{r}
+# Check point of the dimensions of datasets
+stopifnot( identical( colnames(raw_cts), rownames(study) ) )
+stopifnot( identical( rownames(raw_cts), rownames(gene) ) )
+
+raw <- edgeR::DGEList(counts=raw_cts, samples=study, genes=gene)
+```
+
+## Check for seq. bias
+```{r}
+# Check for bias in sequencing depth by KO types.
+p<-ggplot(raw$samples, aes(x=ICU, y=lib.size/1000000)) + 
+  geom_violin(trim=FALSE)+geom_boxplot(width=0.1) + theme_minimal()+ ggtitle("Sequencing library size (millions)")
+
+p <- p + geom_dotplot(binaxis='y', stackdir='center', dotsize=1)
+
+
+df<-data.frame(colnames(raw$counts), raw$samples$AltName, raw$samples$lib.size)
+write.csv(df, "~/Desktop/phd/Thesis/ch2/library_sizes_IDs.csv")
+```
+
+## Filter
+
+To filter the low expression genes the edgeR's filterByExpr() was used.
+Default min number of reads to keep is 10.
+```{r}
+sum(keep <- edgeR::filterByExpr(raw, group=raw$samples$ICU))  ## 60663 -> 21758 
+sum(keep_batch <- edgeR::filterByExpr(batch_norm, group=batch_norm$samples$ICU))  ## 60663 -> 21732 
+```
+
+```{r}
+raw_filtered <- raw[keep, , keep.lib.sizes=FALSE]
+batch_filtered <- batch_norm[keep_batch, , keep.lib.sizes=FALSE]
+
+write.csv(data.frame(batch_filtered$counts, batch_filtered$genes), "~/Desktop/phd/Thesis/ch2/batch_normalized_11_newNames.csv")
+```
+After changing the number of genes from 60663 to 28611, the lib.sizes will be recalculated to be the sum of the counts left in the rows of the experiment for each sample, with keep.lib.sizes = FALSE
+
+Plot the intensities before and after filtering
+```{r}
+tmp <- edgeR::cpm(raw, log=TRUE) %>% melt  ##log2 values returned
+g.before <- ggplot(tmp, aes(value, col=Var2)) + geom_density() + 
+  ggtitle("Before filtering") + theme_bw() + theme(legend.position="none")
+
+tmp <- edgeR::cpm(raw_filtered, log=TRUE) %>% melt
+g.after <- ggplot(tmp, aes(value, col=Var2)) + geom_density() + 
+  ggtitle("After filtering") + theme_bw() + theme(legend.position="none") 
+
+grid.arrange(g.before, g.after, nrow=1)
+
+rm( list=setdiff(ls(), c("raw_filtered", "batch_filtered", "study")) )
+```
+
+## Normalization
+
+The edgeR function calcNormFactors was used to generate and apply normalization factors. By default, the M-values are weighted according to inverse variances, as computedby the delta method for logarithms of binomial random variables. If refColumn is unspecified, then the library whose upper quartile is closest to the mean upper quartile is used.
+```{r}
+# Calculate normalization factors to scale the raw library sizes.
+norm <- edgeR::calcNormFactors(raw_filtered, method="TMM")
+batch_norm <- edgeR::calcNormFactors(batch_filtered, method="TMM")
+
+
+nf <- norm$samples$norm.factors # for each sample
+range(nf) # 0.6014179 to 1.1905579
+o <- order(nf)
+
+boxplot( cpm(raw_filtered[ , o], log=T), xaxt="n", main="Before TMM normalization")
+boxplot( cpm(norm[ , o], log=T),   xaxt="n", main="After TMM normalization")
+
+plot( norm$samples$norm.factors[o],  xaxt="n", main="Normalization factor", xlab="" )
+save(norm, file="~/Desktop/phd/Thesis/ch2/norm_11.rda", compress=TRUE)
+#save(batch_norm, file="~/Desktop/rnaseq/last/batch_norm.rda", compress=TRUE)
+```
+
+## Count number of X and Y genes to determine the gender
+```{r}
+batch_norm_counts <- batch_norm$counts
+
+gene_chr <- read.csv("~/Downloads/mart_export (1).txt",  sep = ",", row.names = 1)
+
+
+# Annotate gene's location on chromosome
+gene_chr <- read.csv("~/Downloads/mart_export_gene_coordinates.txt",  sep = "\t", row.names = 1)
+gene_chr <- gene_chr[, 1:2]
+df_chr <- merge(gene_chr, batch_norm_counts, by = 0)
+df_chr <- dplyr::filter(df_chr, df_chr$Chromosome.scaffold.name == "X" | df_chr$Chromosome.scaffold.name == "Y")
+df_chr <- df_chr[, c(1:2, 4:70)]
+names(df_chr)[2] <- "chr"
+#write.csv(df_chr, "~/Desktop/rnaseq/last/raw/80s_new_metadata/all_expression.csv")
+
+# Calculate average reads per chromosome for each sample
+averages <- aggregate(. ~ chr, data = df_chr[, -1], FUN = mean) # Splits the data into subsets, computes summary statistics for each, and returns the result in a convenient form.
+
+# Gender specific genes
+#  RPS4Y1 and XIST, which are specifically expressed in males and females respectively
+# source: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04307-0#Sec1
+# ENSG00000229807 and ENSG00000129824
+#write.csv(averages, "~/Desktop/rnaseq/last/raw/80s_new_metadata/average_expression.csv")
+
+
+```
+
+
+## DEGs
+```{r}
+#study_outlier <- read.delim("meta_outlier.txt", row.names=1)
+mm <- model.matrix( ~ 0 + ICU + Batch, data=norm$samples)
+colnames(mm) <- gsub("ICU", "", colnames(mm))
+colnames(mm) <- gsub("BatchBatch", "Batch", colnames(mm))
+head(mm,10)
+
+#mm <- model.matrix( ~ 0 + ICU, data=batch_norm$samples)
+#colnames(mm) <- gsub("ICU", "", colnames(mm))
+#colnames(mm) <- gsub("BatchBatch", "Batch", colnames(mm))
+#head(mm,10)
+
+```
+
+## Limma-voom
+Allows for incredibly flexible model specification (you can include multiple categorical and continuous variables, allowing incorporation of almost any kind of metadata)
+
+Based on simulation studies, maintains the false discovery rate at or below the nominal rate, unlike some other packages
+
+The above specifies a model where each coefficient corresponds to a KO's mean
+
+```{r}
+vm <- limma::voomWithQualityWeights(norm, design=mm, plot=T)
+#vm <- limma::voomWithQualityWeights(batch_norm, design=mm, plot=T)
+save(vm, file="~/Desktop/phd/Thesis/ch2/vm_batch_norm_11.rda", compress=TRUE)
+#load("vm.rda")
+```
+What is voom doing?
+
+Counts are transformed to log2 counts per million reads (CPM), where “per million reads” is defined based on the normalization factors we calculated earlier
+A linear model is fitted to the log2 CPM for each gene, and the residuals are calculated
+A smoothed curve is fitted to the sqrt(residual standard deviation) by average expression (see red line in plot above)
+The smoothed curve is used to obtain weights for each gene and sample that are passed into limma along with the log2 CPMs.
+More details at https://urldefense.com/v3/__https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29__;!!Nmw4Hv0!ycgzUCXcFHGhQEnI2H47axDZcJtl7u1xv3mdW2lj-zw3lXmUe2fAPNVM9_db1ABe3hR1QDHrBz5cdvOgBfnGAV0a7_-IGozu-kLL8LEHEdV9$ 
+
+
+Another handy feature of limma-voom  is easy to make contrast matrices
+## Contrast matrix
+```{r}
+cm <- limma::makeContrasts(
+  ICUvsNON = Yes - No,
+  levels= mm )
+```
+
+## Fitting eBayes
+### Empirical Bayes Statistics for Differential Expression
+### Given a microarray linear model fit, compute moderated t-statistics, moderated F-statistic, and log-odds of differential expression by empirical Bayes moderation of the standard errors towards a common value.
+
+Empirical Bayes smoothing of gene-wise standard deviations provides increased power.
+```{r}
+fit <- limma::lmFit(vm[ , rownames(mm) ], mm) # lmFit fits a linear model using weighted least squares for each gene
+fit <- limma::contrasts.fit(fit, cm) # Estimate contrast for each gene
+fit <- limma::eBayes(fit, trend=TRUE) # Empirical Bayes smoothing of standard errors (shrinks standard errors that are much larger or smaller than those from other genes towards the average standard error) (see https://urldefense.com/v3/__https://www.degruyter.com/doi/10.2202/1544-6115.1027__;!!Nmw4Hv0!ycgzUCXcFHGhQEnI2H47axDZcJtl7u1xv3mdW2lj-zw3lXmUe2fAPNVM9_db1ABe3hR1QDHrBz5cdvOgBfnGAV0a7_-IGozu-kLL8Nt1J23i$ )
+```
+
+## Summary tables for H1 KOs
+
+Identify which genes are significantly differentially expressed for each contrast from a fit object containing p-values and test statistics. 
+```{r}
+summary(limma::decideTests(fit)) # Default p valut is 0.05.
+```
+
+Some studies require more than an adjusted p-value cut-off. For a stricter definition on significance, one may require log-fold-changes (log-FCs) to be above a minimum value.
+
+Here we introduced three significance level to the topTable: sig0, sig1 and sig2.
+sig0's -1 means that the gene is significantly downregulated (see parameters in the code); sig0's +1 meand that the gene is significantly upregulated (see parameters in the code);
+sig1 and sig2 values are even stricter.
+
+## Toptable
+
+```{r}
+# Created two significance levels: sig and sig2. Sig based on FC and FDR.
+tt <- topTable(fit, coef="ICUvsNON", adjust.method="fdr", n=Inf) %>% 
+  rownames_to_column("ID") %>% 
+  arrange(P.Value) %>% 
+  mutate(sig0  = sign(logFC)*( abs(logFC) > log2(1.5) & adj.P.Val < 0.05 ),
+   sig1  = sign(logFC)*( abs(logFC) > log2(2) & adj.P.Val < 0.05 ),
+   sig2 = sign(logFC)*( abs(logFC) > log2(4) & adj.P.Val < 0.01 )) %>% 
+  dplyr::select(ID, ENSGID, SYMBOL, 
+    ICUvsNON_LFC=logFC, ICUvsNON_P=P.Value, ICUvsNON_FDR=adj.P.Val, ICUvsNON_sig0=sig0, ICUvsNON_sig1=sig1,ICUvsNON_sig2=sig2)
+
+# add the symbols to tt
+gene <- read.csv("~/Desktop/phd/Thesis/ch2/mart_export.txt",  sep = "\t")
+gene <- gene[,c(1, 3, 5)]
+gene <- gene %>% distinct()
+
+tt <- merge(gene, tt, by="ID", all.y = TRUE)
+names(tt)[names(tt) == 'SYMBOL.x'] <- 'SYMBOL'
+tt <- dplyr::mutate(tt, ICUvsNON_LFC_ABS=abs(tt$ICUvsNON_LFC))
+tt <- dplyr::arrange(tt, ICUvsNON_FDR)
+# save tt
+write.csv(tt, file="~/Desktop/phd/Thesis/ch2/topTable_11_all.csv")
+
+tt_sig <- dplyr::filter(tt, ICUvsNON_FDR <0.05 & ICUvsNON_LFC_ABS > 0.667) #0.667 is 1.5 FC
+write.csv(tt_sig, file="~/Desktop/phd/Thesis/ch2/topTable_sig1_11.csv")
+tt_sig2 <- dplyr::filter(tt, ICUvsNON_FDR <0.01 & ICUvsNON_LFC_ABS > 1) # 2 FC
+write.csv(tt_sig2, file="~/Desktop/phd/Thesis/ch2/topTable_sig2_11.csv")
+```
+
+
+## Volcano plots
+
+```{r}
+pdf(file="~/Desktop/phd/Thesis/ch2/volcano_plots_FDR_001_11.pdf", height=10, width=10)
+
+lfc_tmp <- max( -log10(tt$ICUvsNON_FDR) )
+EnhancedVolcano(tt,
+                lab = NA, # Optional: Replace NA with tt$SYMBOL if you want labels for genes
+                x = "ICUvsNON_LFC", # Log2 Fold Change column
+                y = "ICUvsNON_FDR", # Adjusted p-value (FDR) column
+                pCutoff = 0.05,     # Set the cutoff for adjusted p-value (q-value < 0.05)
+                #subtitle = "ICU vs non-ICU COVID-19 patients",
+                FCcutoff = 1.5,     # Set the cutoff for log2-fold change (log2 FC > 1.5)
+                ylim = c(0, lfc_tmp + 1),  # Adjust y-axis limit
+                ylab = bquote(~-Log[10] ~ italic("adjusted p-value")),
+                title = "",
+                colAlpha = 0.3,
+                selectLab = c(),    # Specify any gene symbols to label, or leave blank
+                drawConnectors = FALSE  # Set to TRUE if you want connectors for labeled points
+) +
+  theme(
+    legend.position = "none",    # Remove legend
+    axis.title = element_text(size = 14),  # Increase axis title size
+    axis.text = element_text(size = 12),   # Increase axis text size
+    plot.title = element_text(size = 16, face = "bold")  # Increase title size and bold it
+  )
+
+dev.off()
+
+
+
+
+```
+
+## The list of genes that are Up or Down regulated. 
+```{r}
+# Function to write a table
+mywrite <- function(...){
+  write.table(..., row.names=F, col.names=F, quote=F)
+}
+
+tt %>% dplyr::filter(ICUvsNON_sig0==1) %>% arrange(ICUvsNON_LFC) %>% 
+  pull(ENSGID) %>% mywrite(file="~/Desktop/phd/Thesis/ch2/siglist_ICUvsNON_sig0_up_11.txt")
+tt %>% dplyr::filter(ICUvsNON_sig0==-1) %>% arrange(ICUvsNON_LFC) %>% 
+  pull(ENSGID) %>% mywrite(file="~/Desktop/phd/Thesis/ch2/siglist_ICUvsNON_sig0_down_11.txt")
+
+tt %>% dplyr::filter(ICUvsNON_sig1==1) %>% arrange(ICUvsNON_LFC) %>% 
+  pull(ENSGID) %>% mywrite(file="~/Desktop/phd/Thesis/ch2/siglist_ICUvsNON_sig1_up_11.txt")
+tt %>% dplyr::filter(ICUvsNON_sig1==-1) %>% arrange(ICUvsNON_LFC) %>% 
+  pull(ENSGID) %>% mywrite(file="~/Desktop/phd/Thesis/ch2/siglist_ICUvsNON_sig1_down_11.txt")
+
+tt %>% dplyr::filter(ICUvsNON_sig2==1) %>% arrange(ICUvsNON_LFC) %>% 
+  pull(ENSGID) %>% mywrite(file="~/Desktop/phd/Thesis/ch2/siglist_ICUvsNON_sig2_up_11.txt")
+tt %>% dplyr::filter(ICUvsNON_sig2==-1) %>% arrange(ICUvsNON_LFC) %>% 
+  pull(ENSGID) %>% mywrite(file="~/Desktop/phd/Thesis/ch2/siglist_ICUvsNON_sig2_down_11.txt")
+```
+
+## Heatmap and number of clusters batch normalized data
+
+```{r}
+save_pheatmap_pdf <- function(x, filename, width=9, height=9) {
+   stopifnot(!missing(x))
+   stopifnot(!missing(filename))
+   pdf(filename, width=width, height=height)
+   grid::grid.newpage()
+   grid::grid.draw(x$gtable)
+   dev.off()
+}
+
+# Reodered study according to heatmap clustering
+#study <- read.csv("~/Desktop/rnaseq/last/raw/80s_new_metadata/meta_80s.csv", row.names = 1)
+
+lcpm <- cpm(norm, log=TRUE)
+topTable.topgenes <- tt_sig$ID
+i <- which(vm$genes$ENSGID %in% topTable.topgenes)
+mycol <- colorRampPalette(c("blue","white","red"))(20)
+
+#annotation info
+annotation <- data.frame(study$AltName, study$Outcome,
+                         study$Age, study$Hospital, study$ICU, study$Gender, study$Comorbidities, row.names = 1)
+colnames(annotation) <- gsub("study.", "", colnames(annotation))
+rownames(annotation) <- colnames(lcpm) # check out the row names of annotation
+##colors
+Age_col <- as.character(wes_palette("IsleofDogs2",  
+                                   40, 
+                                   type = "continuous"))
+names(Age_col) <- unique(study$Age)
+Hospital_col <- as.character(wes_palette("Chevalier1",  
+                                   length(unique(study$Hospital)), 
+                                   type = "continuous"))
+names(Hospital_col) <- unique(study$Hospital)
+libsize_col <- as.character(wes_palette("IsleofDogs2",  
+                                   76, 
+                                   type = "continuous"))
+names(libsize_col) <- unique(study$lib.size)
+
+ann_colors = list(
+    ICU = c(Yes="#972D15", No ="#D8B70B"),
+    Comorbidities = c(none="#E1BD6D", one="#9FA682", two="#274150", three="#F2300F"),
+    #Nationality = c(Saudi="#F1BB7B", Yemeni="#FD6467", Other="#5B1A18"),
+    Gender = c(Female = "#D783FF", Male = "#00DED8"),
+    Outcome = c(Dead="#972D15", Alive ="#D8B70B"),
+    Age = Age_col,
+    Hospital = Hospital_col
+    #Library = c(low="#972D15", high ="#D8B70B")
+    #lib.size = libsize_col
+)
+annotation <- annotation[, c("ICU", "Outcome", "Age", "Hospital", "Gender", "Comorbidities")]
+
+#write.csv(lcpm[i,], "~/Desktop/dnam/rnaseq/cybersortX/all_bRNA_samples_80/degs_67_bn.csv")
+heatmap1 <- pheatmap(lcpm[i,], cluster_cols = F, cluster_rows = T,
+                     scale = "row", #kmeans_k = 20,
+                     cutree_rows = 2, cutree_cols = 2,
+                     color = colorRampPalette(c("blue", "white", "red"))(20),
+                     show_rownames = 0, annotation_col = annotation, 
+                     #cellwidth = 8, cellheight = 8, border_color = "black",
+                     labels_col=study$AltName, annotation_colors = ann_colors,
+                     treeheight_row=0
+                     )
+
+save_pheatmap_pdf(heatmap1, "~/Desktop/phd/Thesis/ch2/Heatmap_annotation_11_ordered.pdf")
+
+# Since we are comparing gene expression patterns we need to scale the data otherwise all of the highly expressed genes will cluster together even if they have different patterns among the samples. The function scale scales collumns. So to scale per gene (rows) data needs to be transposed.
+library(factoextra)
+
+DEgenes <- as.matrix(lcpm[i,])
+scaledata <- t(scale(t(DEgenes)))
+
+s1 <- fviz_nbclust(scaledata, FUN = hcut, method = "silhouette")
+
+
+#Re-order original data (genes) to match ordering in heatmap (top-to-bottom)
+rownames(lcpm[heatmap1$tree_row[["order"]],])
+#Re-order original data (samples) to match ordering in heatmap (left-to-right)
+#colnames(lcpm[,heatmap1$tree_col[["order"]]]) # turn on the clstur cols in pheatmap
+
+#If you want something like gene-to-cluster assignment, you can 'cut' your row dendrogram into a pre-selected number of groups as follows:
+
+#2 groups
+two_clusters <- sort(cutree(heatmap1$tree_row, k=2))
+print(table(two_clusters))
+two_clusters <- t(data.frame(as.list(two_clusters)))
+ID <- row.names(two_clusters)
+two_clusters <- data.frame(ID, two_clusters)
+ 
+write.csv(two_clusters, '~/Desktop/phd/Thesis/ch2/two_clusters_heatmap.csv')
+
+```
+
+## Heatmap of apobecs
+
+```{r}
+save_pheatmap_pdf <- function(x, filename, width=9, height=11) {
+   stopifnot(!missing(x))
+   stopifnot(!missing(filename))
+   pdf(filename, width=width, height=height)
+   grid::grid.newpage()
+   grid::grid.draw(x$gtable)
+   dev.off()
+}
+
+lcpm <- edgeR::cpm(batch_norm, log=TRUE)
+
+tt_apobecs <- dplyr::filter(tt, str_detect(SYMBOL, "APOBEC") & !str_detect(SYMBOL, "APOBEC3H|APOBEC3C"))
+
+topTable.topgenes <- tt_apobecs$ID
+i <- which(vm$genes$ENSGID %in% topTable.topgenes)
+mycol <- colorRampPalette(c("blue","white","red"))(20)
+
+#annotation info
+annotation <- data.frame(study$AltName, study$Outcome,
+                         study$Age, study$Hospital, study$ICU, study$Gender, study$Comorbidities, row.names = 1)
+colnames(annotation) <- gsub("study.", "", colnames(annotation))
+rownames(annotation) <- colnames(lcpm) # check out the row names of annotation
+##colors
+Age_col <- as.character(wes_palette("IsleofDogs2",  
+                                   40, 
+                                   type = "continuous"))
+names(Age_col) <- unique(study$Age)
+Hospital_col <- as.character(wes_palette("Chevalier1",  
+                                   length(unique(study$Hospital)), 
+                                   type = "continuous"))
+names(Hospital_col) <- unique(study$Hospital)
+libsize_col <- as.character(wes_palette("IsleofDogs2",  
+                                   76, 
+                                   type = "continuous"))
+names(libsize_col) <- unique(study$lib.size)
+
+ann_colors = list(
+    ICU = c(Yes="#972D15", No ="#D8B70B"),
+    Comorbidities = c(none="#E1BD6D", one="#9FA682", two="#274150", three="#F2300F"),
+    #Nationality = c(Saudi="#F1BB7B", Yemeni="#FD6467", Other="#5B1A18"),
+    Gender = c(Female = "#D783FF", Male = "#00DED8"),
+    Outcome = c(Dead="#972D15", Alive ="#D8B70B"),
+    Age = Age_col,
+    Hospital = Hospital_col
+    #Library = c(low="#972D15", high ="#D8B70B")
+    #lib.size = libsize_col
+)
+annotation <- annotation[, c("ICU", "Outcome")]
+
+heatmap1 <- pheatmap(lcpm[i,], cluster_cols = F, cluster_rows = T,
+                     scale = "row", #kmeans_k = 20,
+                     cutree_rows = 2, cutree_cols = 2,
+                     color = colorRampPalette(c("blue", "white", "red"))(20),
+                     show_rownames = 1, annotation_col = annotation, 
+                     cellwidth = 10, cellheight = 10, border_color = "black",
+                     labels_col=study$ID, annotation_colors = ann_colors,
+                     treeheight_row=0, labels_row = vm$genes$SYMBOL[i]
+                     )
+
+save_pheatmap_pdf(heatmap1, "~/Desktop/phd/Thesis/ch2/heatmap_apobecs.pdf", width = 5, height = 5)
+```
+
+
+## Heatmap of cytokines
+
+```{r}
+save_pheatmap_pdf <- function(x, filename, width=9, height=11) {
+   stopifnot(!missing(x))
+   stopifnot(!missing(filename))
+   pdf(filename, width=width, height=height)
+   grid::grid.newpage()
+   grid::grid.draw(x$gtable)
+   dev.off()
+}
+
+lcpm <- edgeR::cpm(batch_norm, log=TRUE)
+
+tt_cytokines <- read.csv("~/Desktop/phd/Thesis/ch2/Cytokine_Genes_Analysis.csv")
+
+#tt_cytokines <- dplyr::filter(tt, cytokines$SYMBOL)
+
+topTable.topgenes <- tt_cytokines$ID
+i <- which(vm$genes$ENSGID %in% topTable.topgenes)
+mycol <- colorRampPalette(c("blue","white","red"))(20)
+
+#annotation info
+annotation <- data.frame(study$AltName, study$Outcome,
+                         study$Age, study$Hospital, study$ICU, study$Gender, study$Comorbidities, row.names = 1)
+colnames(annotation) <- gsub("study.", "", colnames(annotation))
+rownames(annotation) <- colnames(lcpm) # check out the row names of annotation
+##colors
+Age_col <- as.character(wes_palette("IsleofDogs2",  
+                                   40, 
+                                   type = "continuous"))
+names(Age_col) <- unique(study$Age)
+Hospital_col <- as.character(wes_palette("Chevalier1",  
+                                   length(unique(study$Hospital)), 
+                                   type = "continuous"))
+names(Hospital_col) <- unique(study$Hospital)
+libsize_col <- as.character(wes_palette("IsleofDogs2",  
+                                   76, 
+                                   type = "continuous"))
+names(libsize_col) <- unique(study$lib.size)
+
+ann_colors = list(
+    ICU = c(Yes="#972D15", No ="#D8B70B"),
+    Comorbidities = c(none="#E1BD6D", one="#9FA682", two="#274150", three="#F2300F"),
+    #Nationality = c(Saudi="#F1BB7B", Yemeni="#FD6467", Other="#5B1A18"),
+    Gender = c(Female = "#D783FF", Male = "#00DED8"),
+    Outcome = c(Dead="#972D15", Alive ="#D8B70B"),
+    Age = Age_col,
+    Hospital = Hospital_col
+    #Library = c(low="#972D15", high ="#D8B70B")
+    #lib.size = libsize_col
+)
+annotation <- annotation[, c("ICU", "Outcome")]
+
+heatmap1 <- pheatmap(lcpm[i,], cluster_cols = F, cluster_rows = T,
+                     scale = "row", #kmeans_k = 20,
+                     cutree_rows = 2, cutree_cols = 2,
+                     color = colorRampPalette(c("blue", "white", "red"))(20),
+                     show_rownames = 1, annotation_col = annotation, 
+                     cellwidth = 5, cellheight = 5, border_color = "black",
+                     labels_col=study$ID, annotation_colors = ann_colors,
+                     treeheight_row=0, labels_row = vm$genes$SYMBOL[i],
+                     fontsize = 5
+                     )
+
+save_pheatmap_pdf(heatmap1, "~/Desktop/phd/Thesis/ch2/heatmap_cytokines.pdf", width = 5, height = 10)
+```
+
+
+
+## Heatmap and number of clusters
+
+```{r}
+save_pheatmap_pdf <- function(x, filename, width=9, height=11) {
+   stopifnot(!missing(x))
+   stopifnot(!missing(filename))
+   pdf(filename, width=width, height=height)
+   grid::grid.newpage()
+   grid::grid.draw(x$gtable)
+   dev.off()
+}
+
+#load(file="norm.rda")
+#tt_sig <- read.csv("topTable_sig0.csv")
+
+lcpm <- edgeR::cpm(batch_norm, log=TRUE)
+topTable.topgenes <- tt_sig2$ID
+i <- which(vm$genes$ENSGID %in% topTable.topgenes)
+mycol <- colorRampPalette(c("blue","white","red"))(20)
+
+#annotation info
+annotation <- data.frame(study$ID, study$Comorbidities, study$Age, study$Hospital,
+                         study$Nationality, study$Gender, study$Outcome, study$ICU, 
+                         row.names = 1)
+colnames(annotation) <- gsub("study.", "", colnames(annotation))
+rownames(annotation) <- colnames(lcpm) # check out the row names of annotation
+##colors
+Comorbidities_col <- as.character(wes_palette("Rushmore1", # color palette for the synergy 
+                                   type = "continuous"))
+names(Comorbidities_col) <- unique(study$Comorbidities)
+
+Nationalities_col <- as.character(wes_palette("GrandBudapest1", 3,# color palette for the synergy 
+                                   type = "discrete"))
+names(Nationalities_col) <- unique(study$Nationality)
+
+ICU_col <- as.character(wes_palette("Cavalcanti1",  
+                                   length(unique(study$ICU)), 
+                                   type = "continuous"))
+names(ICU_col) <- unique(study$ICU)
+Outcome_col <- as.character(wes_palette("Cavalcanti1",  
+                                   length(unique(study$Outcome)), 
+                                   type = "continuous"))
+names(Outcome_col) <- unique(study$Outcome)
+Age_col <- as.character(wes_palette("IsleofDogs2",  
+                                   40, 
+                                   type = "continuous"))
+names(Age_col) <- unique(study$Age)
+Hospital_col <- as.character(wes_palette("Chevalier1",  
+                                   length(unique(study$Hospital)), 
+                                   type = "continuous"))
+names(Hospital_col) <- unique(study$Hospital)
+
+ann_colors = list(
+    ICU = c(Yes="#972D15", No ="#D8B70B"),
+    Comorbidities = c(None="#E1BD6D", One="#9FA682", Two="#274150", Three="#F2300F"),
+    Nationality = c(Saudi="#F1BB7B", Yemeni="#FD6467", Other="#5B1A18"),
+    Gender = c(Female = "#D783FF", Male = "#00DED8"),
+    Outcome = Outcome_col,
+    Age = Age_col,
+    Hospital = Hospital_col
+)
+
+heatmap1 <- pheatmap(lcpm[i,], cluster_cols = F, cluster_rows = T,
+                     scale = "row", #kmeans_k = 20,
+                     cutree_rows = 2, cutree_cols = 2,
+                     color = colorRampPalette(c("blue", "white", "red"))(20),
+                     show_rownames = 0, annotation_col = annotation, 
+                     #cellwidth = 8, cellheight = 8, border_color = "black",
+                     labels_col=study$ID, annotation_colors = ann_colors,
+                     treeheight_row=0
+                     )
+
+save_pheatmap_pdf(heatmap1, "~/Desktop/rnaseq/last/Heatmap_annotation_batch_normalized_sorted2_30.pdf", width = 13, height = 13)
+
+# Since we are comparing gene expression patterns we need to scale the data otherwise all of the highly expressed genes will cluster together even if they have different patterns among the samples. The function scale scales collumns. So to scale per gene (rows) data needs to be transposed.
+library(factoextra)
+
+DEgenes <- as.matrix(lcpm[i,])
+scaledata <- t(scale(t(DEgenes)))
+
+s1 <- fviz_nbclust(scaledata, FUN = hcut, method = "silhouette")
+
+#Re-order original data (genes) to match ordering in heatmap (top-to-bottom)
+rownames(lcpm[heatmap1$tree_row[["order"]],])
+
+#Re-order original data (samples) to match ordering in heatmap (left-to-right)
+write.csv(colnames(lcpm[,heatmap1$tree_col[["order"]]], "~/Desktop/phd/Thesis/ch2/heatmap_order_columns.csv"))
+#a1<-data.frame(colnames(lcpm[,heatmap1$tree_col[["order"]]]), order=1:62, row.names = 1)
+#m1<-merge(a1, study, by = 0)
+#write.csv(m1, "~/Desktop/rnaseq/last/heatmap_order_columns_batch_normalized.csv")
+
+#If you want something like gene-to-cluster assignment, you can 'cut' your row dendrogram into a pre-selected number of groups as follows:
+
+#2 groups
+two_clusters <- sort(cutree(heatmap1$tree_row, k=2))
+print(table(two_clusters))
+two_clusters <- t(data.frame(as.list(two_clusters)))
+ID <- row.names(two_clusters)
+two_clusters <- data.frame(ID, two_clusters)
+ 
+write.csv(two_clusters, '~/Desktop/phd/Thesis/ch2/two_clusters_heatmap11.csv')
+
+```
+
+## Pathway analysis
+```{r}
+library(clusterProfiler)
+
+cluster1_larger <- dplyr::filter(two_clusters, two_clusters=="1")
+cluster1_genes <- cluster1_larger$ID
+
+cluster1 <- enrichGO(
+  keyType = "ENSEMBL",
+  gene = cluster1_genes,
+  OrgDb         = org.Hs.eg.db,
+  ont           = "BP",
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.05,
+  qvalueCutoff  = 0.05,
+  readable      = TRUE)
+
+cluster2_smaller <- dplyr::filter(two_clusters, two_clusters=="2")
+cluster2_genes <- cluster2_smaller$ID
+
+cluster2 <- enrichGO(
+  keyType = "ENSEMBL",
+  gene = cluster2_genes,
+  OrgDb         = org.Hs.eg.db,
+  ont           = "BP",
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.05,
+  qvalueCutoff  = 0.05,
+  readable      = TRUE)
+#keytypes(org.Hs.eg.db)
+
+# Select specific pathways
+
+#selected_pathways_cluster1 <- c("leukocyte chemotaxis","mononuclear cell differentiation","phagocytosis","myeloid leukocyte migration","cellular response to biotic stimulus","neutrophil migration","T cell differentiation","regulation of inflammatory response","positive regulation of protein serine/threonine kinase activity","regulation of interleukin-6 production","toll-like receptor signaling pathway","interleukin-6 production","maintenance of location","regulation of cell morphogenesis","Ras protein signal transduction","regulation of small GTPase mediated signal transduction","B cell activation","positive regulation of GTPase activity","regulation of leukocyte mediated immunity","regulation of cell shape")
+#selected_pathways_cluster2 <- cluster2$Description[1:20][-c(16:17)]
+
+write.csv(cluster1@result, "~/Desktop/phd/Thesis/ch2/clusterProfiler_cluster1.csv")
+write.csv(cluster2@result, "~/Desktop/phd/Thesis/ch2/clusterProfiler_cluster2.csv")
+
+p1 <- dotplot(cluster1, showCategory = 20 ) + viridis::scale_fill_viridis()
+p2 <- dotplot(cluster2, showCategory = 20 ) + viridis::scale_fill_viridis()
+
+pdf(file="~/Desktop/phd/Thesis/ch2/clusterProfiler_heatmapClusters_selected_11.pdf", height=10, width=13)
+cowplot::plot_grid(p1, p2, ncol=2) 
+dev.off()
+```
+
+
+```{r}
+dna <- read.table("Hypermethylated.txt", sep = "\t", header = TRUE)
+
+hyper<- unique(dna$Hyper)
+hypo<-unique(dna$Hypo)
+
+hyper_plot <- enrichGO(
+  keyType = "ENSEMBL",
+  gene = hyper,
+  OrgDb         = org.Hs.eg.db,
+  ont           = "BP",
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.05,
+  qvalueCutoff  = 0.05,
+  readable      = TRUE)
+
+hypo_plot <- enrichGO(
+  keyType = "ENSEMBL",
+  gene = hypo,
+  OrgDb         = org.Hs.eg.db,
+  ont           = "BP",
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.05,
+  qvalueCutoff  = 0.05,
+  readable      = TRUE)
+
+
+p3 <- dotplot(hyper_plot, showCategory = 30) + viridis::scale_fill_viridis()
+p4 <- dotplot(hypo_plot, showCategory = 30) + viridis::scale_fill_viridis()
+
+pdf(file="clusterProfiler_DNAm_heatmapClusters.pdf", height=10, width=13)
+cowplot::plot_grid(p3, p4, ncol=2) 
+dev.off()
+
+```
+
+
+```{r}
+metascape_results <- read.csv("pathway/cluster1_bigger/Enrichment_GO/_FINAL_GO.csv")
+
+data <- read.csv("~/Desktop/S1.csv", header = TRUE, stringsAsFactors = FALSE)
+S1<- ggplot(data, aes(x= Group, y=Pathways, size=DEGs, color=FDR, group=Group)) + geom_point(alpha = 0.8) + 
+theme_classic()
+S1 
+
+S1 = S1+scale_color_gradient(low = "red2",  high = "mediumblue", space = "Lab", limit = c(0.000000000000000007, 0.002))
+S1+scale_size(range = c(2, 8))
+S1
+
+```
+
+## GeneSetCluster
+```{r}
+install_github("TranslationalBioinformaticsUnit/GeneSetCluster")
+source('/Library/Frameworks/R.framework/Versions/4.1/Resources/library/GeneSetCluster/R/BreakUpCluster.R')
+
+
+RNA_up_sig1 <- read.csv("~/Desktop/dnam/rnaseq/pathway/up_sig1/Enrichment_GO/_FINAL_GO.csv", header = TRUE)
+RNA_dowd_sig1 <- read.csv("~/Desktop/dnam/rnaseq/pathway/down_sig1/Enrichment_GO/_FINAL_GO.csv", header = TRUE)
+
+DNA_hypo <- read.csv("~/Desktop/dss/73samples/hypo_dss_73/Enrichment_GO/_FINAL_GO.csv", header = TRUE)
+DNA_hyper <-read.csv("~/Desktop/dss/73samples/hyper_dss_73/Enrichment_GO/_FINAL_GO.csv", header = TRUE)
+
+# Gene-Sets with a pvalue < 0.05 (aka -log10(pvalue) > 1.31) and more than 5 molecules
+RNA_up_sig1_filtered <- RNA_up_sig1[RNA_up_sig1$LogP < -1.31 & RNA_up_sig1$X.GeneInGOAndHitList > 5,]
+DNA_hypo_filtered <- DNA_hypo[DNA_hypo$LogP < -1.31 & DNA_hypo$X.GeneInGOAndHitList > 5,]
+
+nrow(RNA_up_sig1) #3280
+nrow(RNA_up_sig1_filtered) #2674
+nrow(DNA_hypo) #459
+nrow(DNA_hypo_filtered) #325
+#We can see that we have 53 Gene-Sets which are significant according to our definition.
+# Object creator
+RNAupVSDNAhypo.PathwayObject <- ObjectCreator(Pathways = c(RNA_up_sig1_filtered$Description,
+                                                       DNA_hypo_filtered$Description), 
+                                          Molecules = c(RNA_up_sig1_filtered$Hits,
+                                                       DNA_hypo_filtered$Hits),
+                                          Groups = c(rep("RNA_up", times = nrow(RNA_up_sig1_filtered)),
+                                                     rep("DNA_hypo", times = nrow(DNA_hypo_filtered))),
+                                          Source = "Metascape",
+                                          Type = "Test",#Optional
+                                          structure = "SYMBOL",
+                                          organism ="org.Hs.eg.db",
+                                          sep = "|")
+
+```
+
+### Harmonize and Cluster
+```{r}
+
+man.Great.Object2 <- CombineGeneSets(Object = RNAupVSDNAhypo.PathwayObject,
+                                     combineMethod = "Jaccard")
+
+OptimalGeneSets(object = man.Great.Object2, method = "silhouette", max_cluster= 8, cluster_method = "kmeans", main= "Kmeans for 10 clusters")
+
+
+ShowExperimentdata(Object =man.Great.Object2 )
+ShowMeta(Object = man.Great.Object2 )
+
+man.Great.Object3 <- BreakUpCluster(Object = man.Great.Object3, breakup.cluster = 3, sub.cluster=3)   
+
+
+man.Great.Object3 <- ClusterGeneSets(Object = man.Great.Object2, 
+                                 clusters = 2, 
+                                 method = "kmeans")
+
+
+PlotGeneSets(Object =man.Great.Object3)
+
+```
+### Highligting gene clusters
+```{r}
+IPA.object1 <- LoadGeneSets(file_location = canonical.files,
+                         groupnames= c("KO", "WT"),
+                         P.cutoff = 1.3,
+                         Mol.cutoff = 5,
+                         Source = "IPA",
+                         type = "Canonical_Pathways",
+                         structure = "SYMBOL",
+                         seperator = ",")
+IPA.object2 <- CombineGeneSets(Object = IPA.object1)
+
+IPA.object3 <- ClusterGeneSets(Object = IPA.object2,
+                              clusters = 12,
+                              method = "kmeans")
+system.file("data", "Redox.genes.rda", package = "testdat")
+IPA.object3.highlight <- HighlightGeneSets(Object = IPA.object3,
+                                          highligt.genes = Redox.genes,
+                                          name = "Ros")
+
+PlotGeneSets(IPA.object3.highlight)
+ 
+```
+
+
+## Cell deconvolution
+### Data preparation
+```{r}
+#split the dataset into half 31662/2 = 15830 cells + 1 header;
+# 33 samples: 16 control + 17 COVID
+# in terminal
+# cut -f -15831 raw_counts_scrna.txt > new_raw_counts_scrna.txt 
+# 32871 x 15829
+# 32871  6198 only covid mild vs severe
+
+# shift column names to the right by one
+a1<-read.table("~/Downloads/tail.txt", header=T)
+a1$new <- "" 
+names(a1)[1:ncol(a1)] <- c("barcode_id", names(a1)[1:ncol(a1) - 1])
+
+write.table(a1, "new_raw_counts_scrna.txt", row.names = F, quote = F, sep = "\t")
+```
+
+```{r}
+devtools::install_github('xuranw/MuSiC')
+# load
+library(MuSiC)
+
+a1<-
+
+ExpressionSet()
+
+a1<- read.csv("~/Desktop/dnam/rnaseq/data/raw_pool1_2.csv", row.names = 1)
+ensg <- sub("\\..*", "", rownames(a1))  # remove version number in case you have it
+sym <- AnnotationDbi::mapIds(EnsDb.Hsapiens.v86, keys=ensg,
+        column="SYMBOL", keytype="GENEID") # Unable to map 3533 of 60663 requested IDs.
+gene <- data.frame(ENSGID=ensg, SYMBOL=sym, stringsAsFactors=F)
+rownames(gene) <- rownames(a1)
+rownames(a1) <- gene$SYMBOL
+a2<-data.frame(gene, a1)
+a2<-a2[,-1]
+dim(a2) #60664    33
+a2<-a2[complete.cases(a2), ]
+dim(a2) #57131    33
+a3<-a2[!duplicated(a2$SYMBOL), ] #55418    33
+
+rownames(a2) <- a2$SYMBOL
+a2<-a2[,-1]
+getwd()
+write.table(a2, "data/deconvolution/raw_bulk_new.txt", quote = F, sep = "\t")
+
+a4<-read.csv("data/meta_updated.csv", row.names = 1)
+a5<-read.table("data/deconvolution/music.txt", sep = "\t", header = T, row.names = 1)
+write.csv(merge(a4, a5, by = 0), "meta_deconvolution.csv")
+a6<-read.csv("data/deconvolution/heatmap_deconvolution.csv", row.names = 1)
+tA6<-as.data.frame(t(a6))
+a7 <- subset(tA6, rowSums(tA6) > 0.001)
+
+save_pheatmap_pdf <- function(x, filename, width=9, height=9) {
+   stopifnot(!missing(x))
+   stopifnot(!missing(filename))
+   pdf(filename, width=width, height=height)
+   grid::grid.newpage()
+   grid::grid.draw(x$gtable)
+   dev.off()
+}
+mycol <- colorRampPalette(c("blue","white","red"))(20)
+
+#annotation info
+annotation <- data.frame(study$ID, study$Comorbidities, study$Outcome,
+                         study$Age, study$Hospital, study$ICU, row.names = 1)
+colnames(annotation) <- gsub("study.", "", colnames(annotation))
+rownames(annotation) <- colnames(lcpm) # check out the row names of annotation
+##colors
+Comorbidities_col <- as.character(wes_palette("Rushmore1", # color palette for the synergy 
+                                   type = "continuous"))
+names(Comorbidities_col) <- unique(study$Comorbidities)
+
+ICU_col <- as.character(wes_palette("Cavalcanti1",  
+                                   length(unique(study$ICU)), 
+                                   type = "continuous"))
+names(ICU_col) <- unique(study$ICU)
+Outcome_col <- as.character(wes_palette("Cavalcanti1",  
+                                   length(unique(study$Outcome)), 
+                                   type = "continuous"))
+names(Outcome_col) <- unique(study$Outcome)
+Age_col <- as.character(wes_palette("IsleofDogs2",  
+                                   40, 
+                                   type = "continuous"))
+names(Age_col) <- unique(study$Age)
+Hospital_col <- as.character(wes_palette("Chevalier1",  
+                                   length(unique(study$Hospital)), 
+                                   type = "continuous"))
+names(Hospital_col) <- unique(study$Hospital)
+
+ann_colors = list(
+    ICU = ICU_col,
+    Comorbidities = c(None="#E1BD6D", One="#9FA682", Two="#274150", Three="#F2300F"),
+    Outcome = Outcome_col,
+    Age = Age_col,
+    Hospital = Hospital_col
+)
+
+heatmap_deconv <- pheatmap::pheatmap(a7, cluster_cols = T, cluster_rows = T,
+                     #scale = "row", #kmeans_k = 20,
+                     cutree_rows = 2, cutree_cols = 2,
+                     color = mycol,
+                     show_rownames = 1, #annotation_col = annotation, 
+                     cellwidth = 8, cellheight = 8, border_color = "black",
+                     #labels_col= row.names(a6), #annotation_colors = ann_colors,
+                     treeheight_row=2, treeheight_col = 3
+                     )
+save_pheatmap_pdf(heatmap_deconv, "heatmap_deconv.pdf")
+```
+
+
+# DNAm heatmap based on RNAseq
+
+```{r}
+## DNAm heatmap
+
+# 1. Impute NA values.
+# 2. Select DML's perc methylation
+# 3. Make a heatmap on them using pheatmap
+
+library(pheatmap)
+library(Polychrome)
+library(dplyr)
+
+cts<-read.csv("~/Desktop/dnam/analysis/methylKit/perc_methylation_significant/coords.csv", row.names = 1, header = T)
+drops <- c("ICU_02","ICU_05","ICU_06","ICU_07","ICU_10","ICU_12","ICU_13","ICU_14","ICU_15","ICU_19","ICU_20","ICU_21","ICU_23","ICU_24","ICU_29","ICU_30","ICU_31","ICU_33","ICU_34","ICU_35","ICU_38","ICU_39","ICU_42","ICU_43","ICU_48","ICU_50","ICU_51","ICU_54","ICU_58","ICU_60","ICU_61","ICU_62","ICU_64","ICU_66","ICU_68","NON_01","NON_10","NON_12","NON_14","NON_15","NON_18","NON_20","NON_22","NON_23","NON_31")
+
+
+cts <- cts[, !(names(cts) %in% drops)]
+# dim is 60664 x 81
+rownames_cts <- row.names(cts)
+study<-read.csv("~/Desktop/rnaseq/last/meta_dna_based_on_RNAseq.csv", header = T, row.names = 1)
+study <- study[!(rownames(study) %in% drops),]
+col_by_icu <- row.names(study)
+cts <- cts[col_by_icu]
+
+stopifnot( identical( colnames(cts), rownames(study) ) )
+
+#annotation info
+annotation <- data.frame(study$AltName, study$Comorbidities, study$Age,
+                         study$Hospital, study$Outcome, study$ICU, row.names = 1)
+colnames(annotation) <- gsub("study.", "", colnames(annotation))
+rownames(annotation) <- colnames(cts) # check out the row names of annotation
+##colors
+Comorbidities_col <- as.character(wes_palette("Rushmore1", # color palette for the synergy 
+                                              type = "continuous"))
+names(Comorbidities_col) <- unique(study$Comorbidities)
+
+ICU_col <- as.character(wes_palette("Cavalcanti1",  
+                                    length(unique(study$ICU)), 
+                                    type = "continuous"))
+names(ICU_col) <- unique(study$ICU)
+Outcome_col <- as.character(wes_palette("Cavalcanti1",  
+                                        length(unique(study$Outcome)), 
+                                        type = "continuous"))
+names(Outcome_col) <- unique(study$Outcome)
+Age_col <- as.character(wes_palette("IsleofDogs2",  
+                                    40, 
+                                    type = "continuous"))
+names(Age_col) <- unique(study$Age)
+Hospital_col <- as.character(wes_palette("Chevalier1",  
+                                         length(unique(study$Hospital)), 
+                                         type = "continuous"))
+names(Hospital_col) <- unique(study$Hospital)
+
+batch_col <- as.character(glasbey.colors(13))
+names(batch_col) <- unique(study$Batch)
+
+ann_colors = list(
+  ICU = ICU_col,
+  Comorbidities = c(None="#E1BD6D", One="#9FA682", Two="#274150", Three="#F2300F"),
+  Outcome = Outcome_col,
+  Age = Age_col,
+  Hospital = Hospital_col
+  #Batch = batch_col
+)
+
+save_pheatmap_pdf <- function(x, filename, width=9, height=13) {
+  stopifnot(!missing(x))
+  stopifnot(!missing(filename))
+  pdf(filename, width=width, height=height)
+  grid::grid.newpage()
+  grid::grid.draw(x$gtable)
+  dev.off()
+}
+
+heatmap2<- pheatmap(cts, show_rownames = 0, annotation_col = annotation, cluster_cols =F,
+                    cluster_rows = T, annotation_colors = ann_colors, treeheight_row=0,
+                    scale = "none", color = colorRampPalette(c("blue", "white", "red"))(20))
+
+save_pheatmap_pdf(heatmap2, "~/Desktop/rnaseq/last/Heatmap_annotation_dnam_28.pdf")
+
+```
+
+
+

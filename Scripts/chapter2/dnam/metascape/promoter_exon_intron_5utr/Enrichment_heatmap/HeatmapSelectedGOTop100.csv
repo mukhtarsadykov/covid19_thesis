@@ -1,0 +1,101 @@
+GO,Description,_LogP_DEGs,_LogP_DMRs
+WP4747,Netrin UNC5B signaling,-2.310216578464136,-3.816266739703518
+GO:0030029,actin filament-based process,-2.775930664201055,-4.876480784230773
+R-HSA-9006934,Signaling by Receptor Tyrosine Kinases,-3.0842386374376884,-5.2119582070618815
+GO:0001944,vasculature development,-3.783981321207644,-5.5792617054957
+hsa04666,Fc gamma R-mediated phagocytosis,-3.488330174590474,-4.293773640208092
+WP4666,Hepatitis B infection,-3.036048435918535,-3.9053351689264626
+WP3888,VEGFA VEGFR2 signaling,-3.1598867396444983,-3.9975108582675847
+GO:0046903,secretion,-3.884967791102809,-3.9948845196683807
+hsa04650,Natural killer cell mediated cytotoxicity,-3.3562804862042284,-3.426317252753501
+GO:0022604,regulation of cell morphogenesis,-3.938097526387695,-3.78107317160095
+GO:0060759,regulation of response to cytokine stimulus,-3.5468455100705043,-2.500981736935854
+GO:0062207,regulation of pattern recognition receptor signaling pathway,-3.9280675197608637,-2.118546403134374
+GO:0030099,myeloid cell differentiation,-4.352675035899548,-2.048980613242044
+R-HSA-416476,G alpha (q) signalling events,-4.479694648702561,-2.871990388981491
+R-HSA-1474244,Extracellular matrix organization,-5.54782848592864,-2.0160683760437235
+M252,PID IL8 CXCR1 PATHWAY,-4.5264949850319285,-2.599567084280265
+GO:1903034,regulation of response to wounding,-5.298410652362987,-2.7086665062382638
+GO:0008285,negative regulation of cell population proliferation,-5.568652444934518,-2.291767956592294
+GO:0008277,regulation of G protein-coupled receptor signaling pathway,-4.983308073905432,-2.9725653944090205
+R-HSA-9658195,Leishmania infection,-7.3749201011546885,-2.2520372471329972
+GO:0010562,positive regulation of phosphorus metabolic process,-6.170193480008819,-2.0641341476986383
+GO:0098657,import into cell,-9.609352611066992,-3.7702899428030245
+R-HSA-109582,Hemostasis,-12.827407706058239,-3.8273345627498014
+R-HSA-372790,Signaling by GPCR,-17.471616848722523,-2.7525347726267526
+hsa05135,Yersinia infection,-8.33832403776782,-5.956092740112212
+GO:0051336,regulation of hydrolase activity,-6.74639313738159,-4.264739502868762
+GO:0032649,regulation of type II interferon production,-12.303850809049376,0.0
+WP2806,Complement system,-10.526956496830854,0.0
+GO:0002237,response to molecule of bacterial origin,-19.645690228117086,0.0
+GO:0002685,regulation of leukocyte migration,-10.353590340055637,0.0
+R-HSA-198933,Immunoregulatory interactions between a Lymphoid and a non-Lymphoid cell,-14.956977904239501,0.0
+GO:0030335,positive regulation of cell migration,-15.63453458888712,0.0
+GO:0001819,positive regulation of cytokine production,-18.89885958586486,0.0
+hsa04380,Osteoclast differentiation,-14.391703905341808,0.0
+GO:0002252,immune effector process,-10.52180418807125,0.0
+GO:0050764,regulation of phagocytosis,-11.222086324049437,0.0
+hsa05133,Pertussis,-10.516105805802905,0.0
+WP2877,Vitamin D receptor pathway,-12.08315703077832,0.0
+R-HSA-6809371,Formation of the cornified envelope,-11.839602122197416,0.0
+GO:0071674,mononuclear cell migration,-12.7404799041466,0.0
+GO:0002683,negative regulation of immune system process,-11.805826267740906,0.0
+GO:0002274,myeloid leukocyte activation,-12.68558721131595,0.0
+hsa05150,Staphylococcus aureus infection,-11.350606018470323,0.0
+GO:0009611,response to wounding,-10.510367850429164,0.0
+GO:0007159,leukocyte cell-cell adhesion,-11.012740054584519,0.0
+R-HSA-6783783,Interleukin-10 signaling,-13.55104670470598,0.0
+GO:0044703,multi-organism reproductive process,-9.0000531115875,0.0
+WP3937,Microglia pathogen phagocytosis pathway,-8.6781169862849,0.0
+GO:0051046,regulation of secretion,-8.494643994850907,0.0
+WP2880,Glucocorticoid receptor pathway,-6.45324517630609,0.0
+hsa04625,C-type lectin receptor signaling pathway,-6.823611366134662,0.0
+WP5218,Extrafollicular and follicular B cell activation by SARS CoV 2,-7.204218588157555,0.0
+GO:0043068,positive regulation of programmed cell death,-7.2562575869376715,0.0
+WP3945,TYROBP causal network in microglia,-9.2940164460858,0.0
+WP24,Peptide GPCRs,-7.375439638476775,0.0
+M169,PID INTEGRIN2 PATHWAY,-8.542080438177855,0.0
+GO:0002673,regulation of acute inflammatory response,-9.225923035012281,0.0
+GO:0032689,negative regulation of type II interferon production,-7.001233530467866,0.0
+GO:0009620,response to fungus,-8.011354698691434,0.0
+GO:0007188,adenylate cyclase-modulating G protein-coupled receptor signaling pathway,-9.23579217329975,0.0
+hsa05144,Malaria,-6.549870195039931,0.0
+WP4478,LTF danger signal response pathway,-6.925276160234668,0.0
+GO:0002886,regulation of myeloid leukocyte mediated immunity,-8.53074653251802,0.0
+GO:0042119,neutrophil activation,-7.0974377684688275,0.0
+GO:0002523,leukocyte migration involved in inflammatory response,-6.925276160234668,0.0
+GO:0006968,cellular defense response,-6.480761075238644,0.0
+GO:0009612,response to mechanical stimulus,-9.010822564961758,0.0
+WP2840,Hair follicle development cytodifferentiation stage 3 of 3,-6.637743331442503,0.0
+M65,PID FRA PATHWAY,-6.317589584719094,0.0
+GO:0070613,regulation of protein processing,-6.736481680229676,0.0
+GO:0098543,detection of other organism,-5.411031248142768,0.0
+WP117,GPCRs other,-5.399040721562537,0.0
+M11736,SA MMP CYTOKINE CONNECTION,-5.98008920529198,0.0
+GO:0031960,response to corticosteroid,-5.863571795896911,0.0
+GO:0097191,extrinsic apoptotic signaling pathway,-5.613916476201415,0.0
+WP2849,Hematopoietic stem cell differentiation,-5.978798244484367,0.0
+GO:0032663,regulation of interleukin-2 production,-5.651500426601686,0.0
+GO:0050730,regulation of peptidyl-tyrosine phosphorylation,-4.460091527729989,0.0
+GO:0052548,regulation of endopeptidase activity,-5.997921738280958,0.0
+GO:0010817,regulation of hormone levels,-5.425725273314076,0.0
+hsa05418,Fluid shear stress and atherosclerosis,-5.5372400978997485,0.0
+WP2882,Nuclear receptors meta pathway,-5.946483241781555,0.0
+GO:0150077,regulation of neuroinflammatory response,-5.9981106866844325,0.0
+WP5283,Chronic hyperglycemia impairment of neuron function,-4.517726924215512,0.0
+R-HSA-2172127,DAP12 interactions,-5.712779020880443,0.0
+GO:0003013,circulatory system process,-5.301191446518266,0.0
+GO:0002697,regulation of immune effector process,-21.797076531225684,0.0
+GO:0050727,regulation of inflammatory response,-23.201970973659574,0.0
+GO:0050865,regulation of cell activation,-22.516108729974277,0.0
+GO:0050900,leukocyte migration,-26.242189611796455,0.0
+GO:0009617,response to bacterium,-27.15334348315443,0.0
+GO:0071345,cellular response to cytokine stimulus,-22.246523640947938,0.0
+R-HSA-6798695,Neutrophil degranulation,-57.08154622053995,0.0
+GO:0006954,inflammatory response,-45.33520680982095,0.0
+GO:0001775,cell activation,-20.826233478633032,0.0
+hsa04144,Endocytosis,0.0,-5.868018042179049
+GO:0120035,regulation of plasma membrane bounded cell projection organization,0.0,-5.751375576816125
+GO:0000902,cell morphogenesis,0.0,-5.881997317716356
+M272,PID CD8 TCR DOWNSTREAM PATHWAY,0.0,-5.473017146159758
+hsa04360,Axon guidance,0.0,-9.35434389337061
